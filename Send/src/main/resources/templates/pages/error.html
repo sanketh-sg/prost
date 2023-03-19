@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta th:replace="include/head">
+    <title th:text="${statusCode}"></title>
+</head>
+<body class="prost-bg">
+<main class="content-container flex flex-row justify-center items-center">
+    <div class="flex flex-col gap-5 text-center font-bold pt-24">
+        <h2 class="text-4xl text-black" th:text="${statusCode}"></h2>
+        <th:block th:switch="${statusCode}">
+            <h2 class="text-2xl text-black" th:case="403">No, you can't!</h2>
+            <h2 class="text-2xl text-black" th:case="404">Are you lost?</h2>
+            <h2 class="text-2xl text-black" th:case="500">Someone spilled beer in our system! We'll look into it!</h2>
+            <h2 class="text-2xl text-black" th:case="*">If you are seeing this page, an error has occured!</h2>
+        </th:block>
+
+        <div class="prost-frog-image mx-auto"></div>
+        <div class="flex flex-row gap-5">
+            <button class="btn-primary w-1/2" onclick="history.back()">
+                <i class="fa-solid fa-arrow-left"></i>&ensp;
+                Go Back
+            </button>
+            <a class="btn-primary w-1/2" href="/">
+                <i class="fa-solid fa-home"></i>&ensp;
+                Go Home
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

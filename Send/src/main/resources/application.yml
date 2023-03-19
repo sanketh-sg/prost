@@ -1,0 +1,23 @@
+spring:
+    profiles:
+        active: ${APP_ENV:dev,local}
+    jpa:
+        open-in-view: false
+        properties:
+            hibernate:
+                validator:
+                    apply_to_ddl: true
+    thymeleaf:
+        mode: HTML
+        encoding: UTF-8
+    web:
+        locale: en_US
+    session:
+        jdbc:
+            initialize-schema: always
+
+prost:
+    cfg:
+        bi-function-url: ''
+        invoicing-function-url: ''
+

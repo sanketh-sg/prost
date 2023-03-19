@@ -1,0 +1,17 @@
+.cardContent{
+    display: none;
+    background-color: rgba(249, 147, 54, 0.8);
+
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 30px;
+    width: 100%; height: 100%;
+}
+
+.cardContentParent:hover .cardContent{
+    display: flex;
+    cursor: pointer;
+}

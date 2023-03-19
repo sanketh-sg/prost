@@ -1,0 +1,32 @@
+{
+    "name": "uni_bamberg_proj",
+    "version": "1.0.0",
+    "description": "",
+    "main": "frontend/index.js",
+    "scripts": {
+        "build": "webpack",
+        "lint": "eslint --fix ./frontend && prettier --write './*.{yml,yaml,js,json}' './{frontend,src}/**/*.{yml,yaml,js,json}'",
+        "dev": "webpack --watch"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "eslint": "^8.28.0",
+        "prettier": "^2.8.0"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^6.2.1",
+        "css-loader": "^6.7.2",
+        "css-minimizer-webpack-plugin": "^4.2.2",
+        "mini-css-extract-plugin": "^2.7.1",
+        "pnpm": "^7.25.0",
+        "postcss": "^8.4.19",
+        "postcss-loader": "^7.0.1",
+        "postcss-preset-env": "^7.8.3",
+        "tailwindcss": "^3.2.4",
+        "webpack": "^5.75.0",
+        "webpack-cli": "^5.0.0",
+        "webpack-watch-files-plugin": "^1.2.1"
+    }
+}

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta th:replace="include/admin_head">
+    <title>Prost admin</title>
+</head>
+<body class="prost-bg">
+<div class="admin-content-container">
+    <nav class="flex flex-col gap-3 p-5 bg-white h-100">
+        <div class="flex flex-row flex-wrap sm:flex-col gap-3 text-center mb-3">
+            <strong>Admin links</strong>
+            <hr>
+            <a class="btn-danger" href="/admin">Home</a>
+            <a class="btn-danger" href="/admin?p=orders">Orders</a>
+            <a th:if="${!@environment.acceptsProfiles('prod')}" class="btn-danger" href="/admin?p=h2-console">H2-Console</a>
+        </div>
+        <div class="flex flex-row flex-wrap sm:flex-col gap-3 text-center">
+            <strong>Store links</strong>
+            <hr>
+            <a class="btn-primary" href="/">Store home</a>
+            <a class="btn-primary" href="/bottles">Bottles</a>
+            <a class="btn-primary" href="/crates">Crates</a>
+            <a class="btn-primary" href="/orders">Orders</a>
+            <a class="btn-primary" href="/user">User page</a>
+            <a class="btn-primary" href="/logout">Log Out</a>
+        </div>
+    </nav>
+    <div>
+        <div class="admin-widget-container">
+            <div class="admin-widget" th:if="${param.getOrDefault('p', null) == null}">
+                <h2 class="widget-title">Actions</h2>
+                <hr class="mb-3">
+                <div class="flex flex-col" th:each="actionInstance : ${actions}" th:with="instance=${actionInstance.getInstanceName()}">
+                    <h3 class="font-bold mb-3 underline" th:text="${instance}"></h3>
+                    <div th:each="method : ${actionInstance.getMethodNames()}" class="flex flex-row justify-between">
+                        <h4 style="margin-right: 1em;" th:text="${method}"></h4>
+                        <div class="mb-3">
+                            <a class="btn-success" th:href="'/admin/action?a=' + ${instance} + '::' + ${method}">Call</a>
+                            <a class="btn-success" th:href="'/admin/action?a=' + ${instance} + '::' + ${method} + '&await=1'">Await</a>
+                        </div>
+                    </div>
+                    <hr class="my-3">
+                </div>
+            </div>
+
+            <div class="admin-widget" th:if="${param.getOrDefault('p', null) == null}">
+                <div class="flex flex-col gap-3 text-center">
+                    <a href="/admin/form?type=bottle" class="btn-primary">
+                        Create new bottle
+                        <i class="fa-solid fa-wine-bottle"></i>
+                    </a>
+                    <a href="/admin/form?type=crate" class="btn-primary">
+                        Create new crate
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div style="max-width: 280px;" class="admin-widget" th:if="${param.getOrDefault('p', null) == null}">
+                <h2 class="widget-title">Version</h2>
+                <hr class="mb-3">
+                <p class="break-words text-center" nl2br:text="${version}"></p>
+            </div>
+
+            <div th:if="${!@environment.acceptsProfiles('prod') && #strings.equals(#request.getParameter('p'), 'h2-console')}" class="admin-widget text-center">
+                <iframe height="500" width="800" src="/h2-console"></iframe>
+                <span>
+                    Url: <code>jdbc:h2:mem:prost</code>&emsp;
+                    User name: <code>prostadmin</code>&emsp;
+                    Password: <code>strongpassword</code>
+                </span>
+            </div>
+
+            <div th:if="${#strings.equals(#request.getParameter('p'), 'orders')}" class="admin-widget text-center">
+                <div th:replace="include/admin/user_orders"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="include/toasts"></div>
+</body>
+</html>

@@ -1,0 +1,208 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.beverage-card-container {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.beverage-wrapper {
+    @apply border rounded-3xl shadow-lg;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 2em 0;
+    margin: 0 0 2em 2em;
+    background: white;
+
+    .beverage-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 0 2em;
+
+        .beverage-image {
+            @apply rounded-3xl;
+            height: 250px;
+            width: 200px;
+            object-fit: contain;
+
+            &.crate {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+
+                height: calc(250px - 2em);
+            }
+        }
+
+        .crate-bottle-descr {
+            height: 2em;
+            max-width: 200px;
+            text-wrap: normal;
+        }
+
+        .beverage-descr {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2em 0;
+            min-height: 70%;
+            width: 150px;
+            text-align: right;
+
+            & > h2 {
+                text-align: center;
+            }
+        }
+
+        .beverage-to-cart {
+            @apply border rounded-xl;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+
+            .number-input {
+                max-width: 50px;
+                padding: 0;
+            }
+
+            .to-cart-btn {
+                @apply rounded-xl shadow;
+                background-color: var(--success-color);
+                transition: background-color ease-in-out 200ms;
+                color: white;
+
+                &:hover {
+                    background-color: var(--success-color-dark);
+                }
+
+                padding: 0.75em;
+            }
+        }
+    }
+}
+
+.btn {
+    @apply rounded-xl shadow-lg;
+
+    padding: 0.5em 1em;
+    transition: background-color ease-in-out 200ms;
+
+    &-primary {
+        @apply btn;
+        background-color: var(--primary-color);
+        color: white;
+
+        &:hover {
+            background-color: var(--primary-color-dark);
+        }
+    }
+
+    &-danger {
+        @apply btn;
+        background-color: var(--danger-color);
+        color: white;
+
+        &:hover {
+            background-color: var(--danger-color-dark);
+        }
+    }
+
+    &-success {
+        @apply btn;
+        background-color: var(--success-color);
+        color: white;
+
+        &:hover {
+            background-color: var(--success-color-dark);
+        }
+    }
+
+    &-secondary {
+        @apply btn;
+        background-color: var(--gray);
+        color: var(--gray-dark);
+
+        &:hover {
+            background-color: var(--gray-med);
+        }
+    }
+}
+
+.form-control {
+    @apply border-gray-200 bg-gray-200 rounded py-2
+    px-4 text-gray-700 leading-tight border;
+
+    &:focus {
+        outline: none;
+        border: 1px var(--primary-color) solid;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+
+    .form__row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 2em;
+
+        label {
+            font-weight: bold;
+            margin-right: 1em;
+        }
+
+        .form-control {
+            min-width: 40%;
+        }
+    }
+}
+
+.pagination {
+    @apply rounded-xl shadow border;
+    background-color: white;
+
+    .Pagination__container {
+        @apply divide-x-2;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .Pagination__submit {
+        @apply hover:bg-slate-200;
+        padding: 1em 1.5em;
+
+        &.disabled {
+            color: grey;
+            cursor: default;
+
+            &:hover {
+                background-color: white;
+            }
+        }
+
+        &.with-text {
+            width: 80px;
+        }
+    }
+}
+
+.prost-frog-image {
+    @apply rounded-xl shadow;
+    height: 280px;
+    width: 380px;
+    background-image: url("./images/frog.jpg");
+    background-size: 380px 280px;
+    background-color: white;
+}
+
+.error-page-message {
+
+
+}

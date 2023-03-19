@@ -1,0 +1,39 @@
+:root {
+    --tiled-division-index: 0.33;
+}
+
+.tiled-page {
+    display: flex;
+    flex-direction: row;
+}
+
+.tiled-page-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+
+    &--left {
+        width: calc((1 - var(--tiled-division-index)) * 100vw);
+    }
+
+    &--right {
+        width: calc(var(--tiled-division-index) * 100vw);
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .tiled-page-container {
+        &--left {
+            width: auto;
+            max-width: 100vw;
+        }
+
+        &--right {
+            width: auto;
+            max-width: 100vw;
+        }
+    }
+    .tiled-page {
+        flex-direction: column;
+    }
+}

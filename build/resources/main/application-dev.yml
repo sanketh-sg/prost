@@ -1,0 +1,31 @@
+spring:
+    h2:
+        console:
+            enabled: true
+    datasource:
+        username: prostadmin
+        password: strongpassword
+        url: jdbc:h2:mem:prost
+        driverClassName: org.h2.Driver
+    jpa:
+        show-sql: true
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create
+        properties:
+            hibernate:
+                format_sql: true
+    thymeleaf:
+        cache: false
+    web:
+        resources:
+            cache:
+                period: 0
+logging:
+    level:
+        root: info
+
+prost:
+    cfg:
+        bi-function-url: http://localhost:8081/
+        invoicing-function-url: http://localhost:8081/

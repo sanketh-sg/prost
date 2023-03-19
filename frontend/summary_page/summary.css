@@ -1,0 +1,32 @@
+.summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    background-color: var(--primary-color);
+    color: white;
+    text-align: left;
+
+    .Summary__content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        max-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+    }
+
+    height: 100%;
+    padding: 2em;
+}
+
+.cart-submit-button {
+    @apply rounded-md;
+    border: 2px solid white;
+    font-size: x-large;
+    background-color: var(--primary-color);
+    min-width: 200px;
+    transition: background-color ease-in-out 200ms;
+    &:hover {
+        background-color: var(--primary-color-dark);
+    }
+}

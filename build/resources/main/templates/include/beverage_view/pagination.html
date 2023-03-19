@@ -1,0 +1,54 @@
+<div class="pagination">
+    <form id="pagination-form" method="get" th:data-pagination-max-page="${max_page}">
+        <input th:each="p : ${param}" type="hidden" th:name="${p.key}" th:value="${p.value[0]}">
+        <div class="Pagination__container">
+            <button
+                type="button"
+                class="Pagination__submit with-text rounded-tl-xl rounded-bl-xl"
+                data-pagination="0"
+                th:classappend="${
+                    (param.get('page') == null ? '0' : param.get('page'))
+                        .toString().equals('0') ? 'disabled' : ''
+                }"
+                onclick="prostLib.pagination.changePage(this)"
+            >First
+            </button>
+            <button
+                type="button"
+                class="Pagination__submit"
+                data-pagination="-1"
+                th:classappend="${
+                    (param.get('page') == null ? '0' : param.get('page'))
+                        .toString().equals('0') ? 'disabled' : ''
+                }"
+                onclick="prostLib.pagination.changePage(this)"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <button
+                type="button"
+                class="Pagination__submit"
+                data-pagination="+1"
+                th:classappend="${
+                    (param.get('page') == null ? '0' : param.get('page'))
+                        .toString().equals(max_page.toString()) ? 'disabled' : ''
+                }"
+                onclick="prostLib.pagination.changePage(this)"
+            >
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button
+                type="button"
+                class="Pagination__submit with-text rounded-tr-xl rounded-br-xl"
+                data-pagination="max"
+                onclick="prostLib.pagination.changePage(this)"
+                th:classappend="${
+                    (param.get('page') == null ? '0' : param.get('page'))
+                        .toString().equals(max_page.toString()) ? 'disabled' : ''
+                }"
+            >
+                Last
+            </button>
+        </div>
+    </form>
+</div>

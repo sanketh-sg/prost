@@ -1,0 +1,37 @@
+image: google/cloud-sdk:alpine
+stages:
+  - deploy
+
+default:
+  before_script:
+    - curl -s https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer | bash
+    - gcloud auth activate-service-account --key-file .secure_files/maximal-radius-375114-f09823b3e627.json
+  after_script:
+    - rm -rf .secret_files
+
+deploy_application:
+  stage: deploy
+  only:
+    - main
+  script:
+    - echo $DB_PASSWD > src/main/resources/db_passwd
+    - echo "$CI_COMMIT_BRANCH:$CI_COMMIT_SHORT_SHA" > src/main/resources/version
+    - echo "$CI_COMMIT_MESSAGE" >> src/main/resources/version
+    - echo "$CI_JOB_STARTED_AT" >> src/main/resources/version
+    - gcloud --quiet --project "$PROJECT_ID" app deploy app.yaml
+
+deploy_invoicing_function:
+  stage: deploy
+  only:
+    - main
+  script:
+    - cd invoicing-function
+    - gcloud functions deploy invoicing-function --project "$PROJECT_ID" --set-env-vars GOOGLE_APPLICATION_CREDENTIALS="$(cat .secure_files/maximal-radius-375114-f09823b3e627.json)" --quiet --max-instances 1 --entry-point $(cat functionMainClass) --region europe-west3 --runtime java17 --trigger-http --memory 512MB
+
+deploy_bi_function:
+  stage: deploy
+  only:
+    - main
+  script:
+    - cd bi-function
+    - gcloud functions deploy bi-function --project "$PROJECT_ID" --set-env-vars GOOGLE_APPLICATION_CREDENTIALS="$(cat .secure_files/maximal-radius-375114-f09823b3e627.json)" --quiet --max-instances 1 --entry-point $(cat functionMainClass) --region europe-west3 --runtime java17 --trigger-http --memory 512MB

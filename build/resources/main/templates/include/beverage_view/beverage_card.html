@@ -1,0 +1,53 @@
+<div class="beverage-wrapper">
+    <div class="beverage-content">
+        <img class="beverage-image"
+             th:classappend="${beverage.isCrateInstance() ? 'crate' : ''}"
+             th:src="${beverage.getPicture()}"
+             th:alt="${beverage.getName()}"
+        >
+        <div th:if="${beverage.isCrateInstance()}" class="crate-bottle-descr">
+            <strong>Contains: </strong>
+            <span th:text="${beverage.bottle.toString()}"></span>
+        </div>
+    </div>
+    <div class="beverage-content">
+        <div class="beverage-descr">
+            <h2><strong th:text="${beverage.getName()}"></strong></h2>
+            <hr />
+            <p th:text="'€' + ${beverage.getPrice()}"></p>
+            <hr />
+            <p th:text="${beverage.getInStock()} + ' in stock'"></p>
+        </div>
+        <div class="flex flex-row justify-end">
+            <form th:action="@{/cart/add}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <input name="beverageId" th:value="${beverage.getId()}" type="hidden">
+                <input name="next"
+                       th:value="
+                           ${#httpServletRequest.getRequestURI()} + ${#httpServletRequest.getQueryString() == null ?
+                                '' :
+                                '?' + #httpServletRequest.getQueryString()
+                       }"
+                       type="hidden">
+                <div class="flex flex-row justify-end">
+                    <div class="beverage-to-cart py-3">
+                        <div class="flex flex-col justify-center px-3">
+                            <input
+                                type="number"
+                                name="count"
+                                class="number-input"
+                                value="1" min="1" th:max="${beverage.getInStock()}"
+                                aria-label="Beverage count"
+                            >
+                        </div>
+                        <div class="flex flex-col justify-center px-3">
+                            <button type="submit" class="to-cart-btn">
+                                <i class="fa-solid fa-lg fa-cart-shopping"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

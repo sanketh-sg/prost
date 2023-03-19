@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta th:replace="include/head">
+    <title>Login</title>
+</head>
+<body class="prost-bg">
+<div th:replace="include/navbar"></div>
+<main class="content-container flex flex-row justify-center items-center text-black">
+    <div class="flex flex-col p-8 bg-white shadow rounded-xl">
+        <div class="logo self-center">
+            <a href="/"><img class="h-16" src="/images/Prost.png" alt="Prost"></a>
+        </div>
+        <p class="py-3">Welcome back, Amigo!</p>
+        <form th:action="@{/login}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input name="next" th:if="${next != null && next.length() > 0}" type="hidden" th:value="next">
+            <div class="w-[320px]">
+                <div>
+                    <label for="loginform__username"></label><br>
+                    <input class="form-control w-full"
+                           id="loginform__username" name="username" type="text" placeholder="Username"
+                           required autofocus>
+                </div>
+                <div class="mb-5">
+                    <label for="loginform__password"></label><br>
+                    <input class="form-control w-full"
+                           id="loginform__password" name="password" type="password" placeholder="Password"
+                           required>
+                </div>
+                <div class="flex flex-row gap-2 text-center font-bold">
+                    <button class="btn-primary drop-shadow w-1/2" type="submit">Sign In</button>
+                    <a class="btn-secondary drop-shadow w-1/2" href="/register">Register</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+<div th:replace="include/footer"></div>
+</body>
+</html>

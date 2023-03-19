@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta th:replace="include/head">
+    <title>Crates</title>
+</head>
+<body class="prost-bg">
+<div>
+    <div th:replace="include/navbar"></div>
+    <main class="content-container mx-auto container py-3">
+        <div class="flex justify-end gap-5 pb-5">
+            <a
+                class="btn-primary flex flex-col justify-center"
+                th:href="@{/admin/form(type='crate', from=${#httpServletRequest.getRequestURI()} +
+                    ${#httpServletRequest.getQueryString() == null ? '' : '?' + #httpServletRequest.getQueryString()})}">
+                <span>
+                    <i class="fa-solid fa-shopping-basket"></i>&ensp;
+                    Add crate
+                </span>
+            </a>
+            <div th:replace="include/beverage_view/pagination"></div>
+        </div>
+        <div th:replace="include/beverage_view/beverage_view"></div>
+    </main>
+    <footer th:replace="include/footer"></footer>
+</div>
+</body>
+</html>

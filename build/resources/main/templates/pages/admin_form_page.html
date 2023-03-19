@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta th:replace="include/admin_head">
+    <title>Prost admin</title>
+</head>
+<body class="prost-bg">
+<nav th:replace="include/navbar"></nav>
+<main class="content-container flex flex-row justify-center">
+    <div class="bg-white p-5 m-5 rounded-xl drop-shadow">
+        <th:block th:if="${param.get('type') != null}">
+            <th:block th:if="${param.getOrDefault('type', '_').toString().equals('bottle')}">
+                <div th:replace="include/admin/bottle_form"></div>
+            </th:block>
+            <th:block th:if="${param.getOrDefault('type', '_').toString().equals('crate')}">
+                <div th:replace="include/admin/crate_form"></div>
+            </th:block>
+        </th:block>
+        <div th:if="${param.get('type') == null}" class="flex flex-col text-center gap-3">
+            <h2>Form types:</h2>
+            <a class="btn-primary" th:href="@{${#httpServletRequest.getRequestURI()}(type='bottle')}">
+                Bottle
+            </a>
+            <a class="btn-primary" th:href="@{${#httpServletRequest.getRequestURI()}(type='crate')}">
+                Crate
+            </a>
+        </div>
+    </div>
+</main>
+<footer th:replace="include/footer"></footer>
+</body>
+</html>

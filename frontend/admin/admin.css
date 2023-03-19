@@ -1,0 +1,29 @@
+.admin-content-container {
+    @apply sm:flex-row flex-col;
+
+    min-height: 100vh;
+    display: flex;
+    width: 100%;
+}
+
+.admin-widget-container {
+    color: black;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 2em;
+    padding: 2em;
+
+    .admin-widget {
+        @apply rounded-xl shadow-lg;
+        background-color: white;
+        padding: 2em;
+
+        .widget-title {
+            @apply text-2xl;
+            font-weight: bold;
+            text-align: center;
+        }
+    }
+}

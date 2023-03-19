@@ -1,0 +1,212 @@
+{
+    "users": [
+        {
+            "username": "marek",
+            "password": "tvojeMama",
+            "birthday": "2000-07-10",
+            "role": "ROLE_ADMIN"
+        },
+        {
+            "username": "sscrease2",
+            "password": "tUVDj7t",
+            "birthday": "1998-12-18"
+        },
+        {
+            "username": "ddimmne3",
+            "password": "clqlGO",
+            "birthday": "1998-12-03"
+        }
+    ],
+    "bottles": [
+        {
+            "name": "Dunkel",
+            "bottlePic": "https://i.postimg.cc/tgzJMP7x/loewenbraeu-dunkel.png",
+            "volume": 0.50,
+            "volumePercent": 2.0,
+            "price": 25,
+            "supplier": "Loewenbraeu",
+            "inStock": 618
+        },
+        {
+            "name": "Maerzen",
+            "bottlePic": "https://i.postimg.cc/FFCdvjpb/Flasche-Hofmuehl-Maerzen-1.png",
+            "volume": 0.5,
+            "volumePercent": 1.72,
+            "price": 2,
+            "supplier": "Hofmuehl",
+            "inStock": 632
+        },
+        {
+            "name": "Muenchener",
+            "bottlePic": "https://i.postimg.cc/xdQq5gjQ/loewenbraeu-muenchener-hell.png",
+            "volume": 0.5,
+            "volumePercent": 7.69,
+            "price": 55,
+            "supplier": "Loewenbraeu",
+            "inStock": 368
+        },
+        {
+            "name": "Oktoberfest",
+            "bottlePic": "https://i.postimg.cc/SsNRFszt/loewenbraeu-oktoberfest.png",
+            "volume": 10.42,
+            "volumePercent": 3.68,
+            "price": 51,
+            "supplier": "Loewenbraeu",
+            "inStock": 582
+        },
+        {
+            "name": "Whisky",
+            "bottlePic": "https://i.postimg.cc/Hxmf7VgW/Tobermory-21-Years-26673-Whisky.png",
+            "volume": 3.96,
+            "volumePercent": 30.0,
+            "price": 85,
+            "supplier": "Tobermory",
+            "inStock": 595
+        },
+        {
+            "name": "Original",
+            "bottlePic": "https://i.postimg.cc/1XX86tmN/loewenbraeu-original-flasche.png",
+            "volume": 1.58,
+            "volumePercent": 2.55,
+            "price": 91,
+            "supplier": "Loewenbraeu",
+            "inStock": 43
+        },
+        {
+            "name": "Weiss",
+            "bottlePic": "https://i.postimg.cc/wjTh26wF/Alkoholfreier-Wein-Carl-Jung-Deutschland.png",
+            "volume": 8.18,
+            "volumePercent": 6.61,
+            "price": 92,
+            "supplier": "Carl Jung",
+            "inStock": 483
+        },
+        {
+            "name": "Kolonne",
+            "bottlePic": "https://i.postimg.cc/LsJjdxK1/Alkoholfreier-Wein-Kolonne-Null-Deutschland-0-75ltr.png",
+            "volume": 13.88,
+            "volumePercent": 0.0,
+            "price": 85,
+            "supplier": "Carl Jung",
+            "inStock": 279
+        },
+        {
+            "name": "Merlot",
+            "bottlePic": "https://i.postimg.cc/13CDYLTS/Alkoholfreier-Wein-Goodvine-rsquo-s-Deutschland-0-75ltr.png",
+            "volume": 10.09,
+            "volumePercent": 4.39,
+            "price": 44,
+            "supplier": "Goodvines",
+            "inStock": 229
+        },
+        {
+            "name": "Sauvigno",
+            "bottlePic": "https://i.postimg.cc/bNRx1G9s/Alkoholfreier-Wein-Carl-Jung-Deutschland-Cabernet0-75ltr.png",
+            "volume": 0.5,
+            "volumePercent": 5.0,
+            "price": 69,
+            "supplier": "Carl Jung",
+            "inStock": 199
+        },
+        {
+            "name": "Vibrante",
+            "bottlePic": "https://i.postimg.cc/RVvfCSx9/Martini-Vibrante-alkoholfrei-21768.png",
+            "volume": 5.35,
+            "volumePercent": 0.0,
+            "price": 28,
+            "supplier": "Martini Rossi",
+            "inStock": 328
+        },
+        {
+            "name": "Bester",
+            "bottlePic": "https://i.postimg.cc/jjBPRytk/Beckers-Bester-Luxuslinie-Merlot-sortenreiner-roter-Traubensaft-24984.png",
+            "volume": 9.1,
+            "volumePercent": 4.76,
+            "price": 40,
+            "supplier": "Backers",
+            "inStock": 316
+        },
+        {
+            "name": "Ladubay",
+            "bottlePic": "https://i.postimg.cc/63RRqTQ6/Bouvet-Ladubay-La-Petite-Reine-Jus-de-Pommes-Petillant-alkoholfrei-25823.png",
+            "volume": 2.76,
+            "volumePercent": 0.0,
+            "price": 5,
+            "supplier": "Domaine La Petite Reine",
+            "inStock": 443
+        },
+        {
+            "name": "Zero",
+            "bottlePic": "https://i.postimg.cc/Hn9y0K5f/Boar-Zero-Bio-Destillat-alkoholfrei-aus-dem-Schwarzwald-24278.png",
+            "volume": 5.13,
+            "volumePercent": 0.0,
+            "price": 25,
+            "supplier": "Boar Distiller",
+            "inStock": 462
+        },
+        {
+            "name": "Martini_Floreale",
+            "bottlePic": "https://i.postimg.cc/fWcmh3FB/Martini-Floreale-alkoholfrei-21769.png",
+            "volume": 3.43,
+            "volumePercent": 0.0,
+            "price": 85,
+            "supplier": "Martini and Rossi",
+            "inStock": 554
+        },
+        {
+            "name": "Halles",
+            "bottlePic": "https://i.postimg.cc/KcnN4Jq2/helles-heinzlein-alkoholarm.png",
+            "volume": 6.03,
+            "volumePercent": 5.47,
+            "price": 56,
+            "supplier": "Yodoo",
+            "inStock": 734
+        },
+        {
+            "name": "Pool",
+            "bottlePic": "https://i.postimg.cc/brHHMwDJ/WS-Hellesx-Glas-020e2aec51.webp",
+            "volume": 11.29,
+            "volumePercent": 1.21,
+            "price": 95,
+            "supplier": "Aivee",
+            "inStock": 363
+        }
+    ],
+    "crates": [
+        {
+            "name": "Alkoholfrei_Kasten",
+            "cratePic": "https://i.postimg.cc/JzkBPGbN/alkoholfrei-Kasten-35a15018.png",
+            "noOfBottles": 20,
+            "price": 81.0,
+            "cratesInStock": 500
+        },
+        {
+            "name": "Lager_Kasten",
+            "cratePic": "https://i.postimg.cc/8Cgf3NHq/lager-kasten-9c8d3c8b.png",
+            "noOfBottles": 20,
+            "price": 100.0,
+            "cratesInStock": 500
+        },
+        {
+            "name": "Vollbier_Kasten",
+            "cratePic": "https://i.postimg.cc/hPHXzcHf/vollbier-kasten-cb3e9e73.png",
+            "noOfBottles": 20,
+            "price": 88.0,
+            "cratesInStock": 500
+        },
+        {
+            "name": "Pills_Kasten",
+            "cratePic": "https://i.postimg.cc/0j4bCsjX/pils-kasten-c00eaadb.png",
+            "noOfBottles": 20,
+            "price": 79.0,
+            "cratesInStock": 500
+        },
+        {
+            "name": "Weisbeir_Kasten",
+            "cratePic": "https://i.postimg.cc/3xmd2zT9/weissbier-kasten-a7575d53.png",
+            "noOfBottles": 20,
+            "price": 110.0,
+            "cratesInStock": 500
+        }
+    ]
+}

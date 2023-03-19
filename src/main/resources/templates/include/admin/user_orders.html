@@ -1,0 +1,47 @@
+<div>
+    <div class="flex flex-row w-100 justify-evenly">
+        <form id="username_orders_form" method="get" action="/admin">
+            <input type="hidden" name="p" value="orders">
+            <select name="username" class="form-control" aria-label="users" onchange="document.querySelector('#username_orders_form').submit()">
+                <option value="">-- Select user --</option>
+                <option th:each="uname : ${all_users}" th:value="${uname}" th:text="${uname}" th:selected="${#strings.equals(#request.getParameter('username'), uname)}"></option>
+            </select>
+        </form>
+        <h1 class="text-3xl mt-3 mb-3"><strong>All orders</strong></h1>
+    </div>
+
+    <div class="overflow-x-auto relative rounded-xl shadow">
+        <table class="w-[75vw] text-left">
+            <thead class="uppercase text-lg bg-gray-50 border-b">
+            <tr>
+                <th scope="col" class="py-3 px-6">
+                    User
+                </th>
+                <th scope="col" class="py-3 px-6">
+                    Ordered on
+                </th>
+                <th scope="col" class="py-3 px-6">
+                    Total price
+                </th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}"
+                class="bg-white cursor-pointer transition-colors"
+            >
+                <th
+                    scope="row"
+                    class="py-4 px-6 whitespace-nowrap"
+                    th:text="${order.user.username}"
+                ></th>
+                <td class="py-4 px-6" th:text="${#dates.format(order.createdOn, 'dd-MM-yyyy hh a')}"></td>
+                <td class="py-4 px-6" th:text="'€' + ${order.price}"></td>
+                <td>
+                    <button class="btn-success">Print PDF</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

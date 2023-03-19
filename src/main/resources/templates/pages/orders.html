@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="${#authentication.getName()} + '\'s orders'"></title>
+    <meta th:replace="include/head">
+</head>
+<body class="prost-bg text-black">
+<div th:replace="include/navbar"></div>
+<main class="content-container flex flex-row justify-center">
+    <div>
+        <h1 class="text-3xl mt-3 mb-3"><strong>Your orders</strong></h1>
+        <div class="overflow-x-auto relative rounded-xl shadow">
+            <table class="w-[75vw] text-left">
+                <thead class="uppercase text-lg bg-gray-50 border-b">
+                <tr>
+                    <th scope="col" class="py-3 px-6">
+                        #
+                    </th>
+                    <th scope="col" class="py-3 px-6">
+                        Ordered on
+                    </th>
+                    <th scope="col" class="py-3 px-6">
+                        Total price
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}"
+                    class="bg-white hover:bg-primary cursor-pointer transition-colors"
+                    th:onclick="'window.location.assign(\'/orders/' + ${order.id} +'\');'"
+                >
+                    <th
+                        scope="row"
+                        class="py-4 px-6 whitespace-nowrap"
+                        th:text="${orderStat.index}"
+                    ></th>
+                    <td class="py-4 px-6" th:text="${#dates.format(order.createdOn, 'dd-MM-yyyy hh a')}"></td>
+                    <td class="py-4 px-6" th:text="'€' + ${order.price}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="include/footer"></footer>
+</body>
+</html>

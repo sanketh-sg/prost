@@ -1,0 +1,52 @@
+<footer class="prost-footer">
+    <div class="footer-part">
+        <div class="footer-links">
+            <span class="mb-2"><strong>Address</strong></span>
+            <p>Křižíkova 486<br />
+                54101 Trutnov 1<br />
+                Czech Republic
+            </p>
+        </div>
+        <div class="footer-links">
+            <span class="mb-2"><strong>Contact Us</strong></span>
+            <p>Call: +420 606 326 408<br />
+                Email: <a class="hover:underline" href="mailto:pivovar@pivovar-krakonos.cz">pivovar@pivovar-krakonos.cz</a>
+            </p>
+        </div>
+    </div>
+    <div class="flex flex-col justify-between text-center">
+        <a href="/">
+            <img style="width: 300px;" src="/images/Prost.png" alt="Prost">
+        </a>
+        <div class="flex flex-row justify-between px-5">
+            <a href="">
+                <i class="fa-brands fa-lg fa-instagram"></i>
+            </a>
+            <a href="">
+                <i class="fa-brands fa-lg fa-twitter"></i>
+            </a>
+            <a href="">
+                <i class="fa-brands fa-lg fa-facebook"></i>
+            </a>
+        </div>
+        <p>© 2022 Group 6</p>
+    </div>
+    <div class="footer-part">
+        <div sec:authorize="isAuthenticated()" class="footer-links">
+            <span class="mb-2"><strong>Account</strong></span>
+            <a href="/orders">Orders</a>
+            <a href="/user">Details</a>
+            <a href="/logout">Log Out</a>
+        </div>
+        <div sec:authorize="isAnonymous()" class="footer-links">
+
+        </div>
+        <div class="footer-links">
+            <span class="mb-2"><strong>Pages</strong></span>
+            <a href="/">Home</a>
+            <a href="/bottles">Bottles</a>
+            <a href="/crates">Crates</a>
+        </div>
+    </div>
+</footer>
+<div th:include="include/toasts"></div>

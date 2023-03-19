@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta th:replace="include/head">
+    <title>[[${user.username}]]'s settings</title>
+</head>
+<body class="prost-bg">
+<div class="page_container">
+    <div th:replace="include/navbar"></div>
+    <main class="content-container mx-auto container py-3 text-black">
+        <div class="flex flex-row justify-center gap-5 flex-wrap">
+            <div class="flex flex-row justify-end mb-3">
+                <div class="py-5">
+                    <form action="/logout" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button class="btn-primary" type="submit"><i class="fa-solid fa-user-large-slash"></i> Log out</button>
+                    </form>
+                </div>
+            </div>
+            <form action="/user" method="post" th:object="${user}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="form max-w-lg p-5 mx-auto rounded-lg shadow-lg border bg-white">
+                    <h2 class="text-xl text-center"><strong>User credentials</strong></h2>
+                    <hr class="mb-3" />
+                    <div class="form__row">
+                        <label>Your username:</label>
+                        <span class="form-control font-bold" th:text="*{username}"></span>
+                    </div>
+                    <div class="form__row">
+                        <label for="UserForm__birthday">Birthday: </label>
+                        <input id="UserForm__birthday" class="form-control" type="date" th:field="*{birthday}">
+                    </div>
+                    <div class="form__row">
+                        <label for="UserForm__billingAddress">Billing address: </label>
+                        <select class="form-control" id="UserForm__billingAddress" th:field="*{billingAddress}">
+                            <option th:value="null">-- Select address --</option>
+                            <option th:each="bAaddress:${allAddresses}" th:value="${bAaddress.id}"
+                                    th:text="${bAaddress.toString()}"></option>
+                        </select>
+                    </div>
+                    <div class="form__row">
+                        <label for="UserForm__deliveryAddress">Delivery address: </label>
+                        <select class="form-control" id="UserForm__deliveryAddress" th:field="*{deliveryAddress}">
+                            <option th:value="null">-- Select address --</option>
+                            <option th:each="bAaddress:${allAddresses}" th:value="${bAaddress.id}"
+                                    th:text="${bAaddress.toString()}"></option>
+                        </select>
+                    </div>
+                    <div class="form__row">
+                        <span></span>
+                        <button type="submit" class="btn-primary">Apply changes</button>
+                    </div>
+                </div>
+            </form>
+            <form action="/user/addAddress" method="post" th:object="${address}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="form max-w-lg p-5 mx-auto rounded-lg shadow-lg border bg-white">
+                    <h2 class="text-xl text-center"><strong>Add new address</strong></h2>
+                    <hr class="mb-3" />
+                    <div class="form__row">
+                        <label for="AddressForm__street">Street: </label>
+                        <input id="AddressForm__street" class="form-control" type="text" th:field="*{street}">
+                    </div>
+                    <div class="form__row">
+                        <label for="AddressForm__number">Address Number: </label>
+                        <input id="AddressForm__number" class="form-control" type="text" th:field="*{number}">
+                    </div>
+                    <div class="form__row">
+                        <label for="AddressForm__postalCode">Address postal code: </label>
+                        <input id="AddressForm__postalCode" class="form-control" type="text" th:field="*{postalCode}">
+                    </div>
+                    <div class="form__row">
+                        <span></span>
+                        <button type="submit" class="btn-primary">Add address</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer th:replace="include/footer"></footer>
+</div>
+</body>
+</html>

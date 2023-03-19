@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Success</title>
+    <meta th:replace="include/head">
+</head>
+<body class="prost-bg">
+<div th:replace="include/navbar"></div>
+<main class="content-container flex justify-center items-center">
+    <div class="flex flex-col gap-5 font-bold text-center">
+        <h2 class="text-2xl text-black">Your order was recieved! We wish you a happy time! Prost!</h2>
+        <div class="prost-frog-image mx-auto"></div>
+        <div class="flex flex-row gap-5">
+            <a class="btn-primary w-1/2" href="/"><strong>Continue with shopping</strong></a>
+            <a class="btn-primary w-1/2" href="/orders"><strong>See your orders</strong></a>
+        </div>
+    </div>
+</main>
+<footer th:replace="include/footer"></footer>
+</body>
+</html>

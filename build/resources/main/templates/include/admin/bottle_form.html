@@ -1,0 +1,81 @@
+<div class="flex flex-row justify-between mb-3">
+    <a class="btn-primary" th:if="${param.get('from') != null}" th:with="from=${param.get('from').toString()}" th:href="${from}">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h2 class="text-center text-3xl">Add new bottle</h2>
+    <span></span>
+</div>
+<hr class="mb-3" />
+<form action="/admin/addBottle" method="post" th:object="${bottle}">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <input type="hidden" name="next"
+           th:value="${#httpServletRequest.getRequestURI()} + '?' + ${#httpServletRequest.getQueryString()}"
+    >
+    <div class="form">
+        <div class="form__row">
+            <label for="BottleForm__name">Name</label>
+            <input id="BottleForm__name" class="form-control" th:field="*{name}">
+        </div>
+        <div class="form__row">
+            <label for="BottleForm__bottlePic">Picture URL</label>
+            <input id="BottleForm__bottlePic" class="form-control" th:field="*{bottlePic}">
+        </div>
+        <div class="form__row">
+            <label for="BottleForm__volume">Volume</label>
+            <div class="flex flex-row justify-end max-w-[67%]">
+                <input id="BottleForm__volume" type="number" min="0" step="0.01" class="form-control"
+                       th:field="*{volume}">
+                <span class="p-2 w-[2em]">l</span>
+            </div>
+        </div>
+        <div class="form__row">
+            <label for="BottleForm__volumePercent">Volume %</label>
+            <div class="flex flex-row justify-end max-w-[67%]">
+                <input
+                    id="BottleForm__volumePercent"
+                    type="number"
+                    min="0" max="100" step="0.01"
+                    class="form-control"
+                    th:field="*{volumePercent}"
+                >
+                <span class="p-2 w-[2em]">%</span>
+            </div>
+        </div>
+        <div class="form__row">
+            <label for="BottleForm__price">Price</label>
+            <div class="flex flex-row justify-end max-w-[67%]">
+                <input
+                    id="BottleForm__price"
+                    type="number"
+                    min="1"
+                    class="form-control"
+                    th:field="*{price}"
+                >
+                <span class="p-2 w-[2em]">€</span>
+            </div>
+        </div>
+        <div class="form__row">
+            <label for="BottleForm__supplier">Supplier</label>
+            <input
+                id="BottleForm__supplier"
+                type="text"
+                class="form-control"
+                th:field="*{supplier}"
+            >
+        </div>
+        <div class="form__row">
+            <label for="BottleForm__inStock">In stock</label>
+            <input
+                id="BottleForm__inStock"
+                type="number"
+                min="0"
+                class="form-control"
+                th:field="*{inStock}"
+            >
+        </div>
+        <div class="flex flex-row justify-between">
+            <span></span>
+            <button type="submit" class="btn-primary">Create</button>
+        </div>
+    </div>
+</form>

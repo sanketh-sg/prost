@@ -1,0 +1,24 @@
+<div id="toast_container">
+    <div class="toast"
+         th:each="toast : ${__toasts}"
+         th:classappend="
+         ${toast.getLevel().name() == 'INFO' ? 'bg-sky-400 text-white hover:bg-sky-600' :
+            (toast.getLevel().name() == 'SUCCESS' ? 'bg-success hover:bg-success-dark' :
+                (toast.getLevel().name() == 'NOTICE' ? 'bg-warning hover:bg-warning-dark' :
+                    (toast.getLevel().name() == 'ERROR' ? 'bg-danger hover:bg-danger-dark hover:text-white text-white' : '')
+                )
+            )
+         }"
+         th:id="'toast_message-' + ${toastStat.index}"
+    >
+        <div nl2br:text="${toast.getMessage()}"></div>
+        <button class="toast_container__toast-close-button"
+                th:onclick="prostLib.transitions.slideOffScreen('#toast_message-[[${toastStat.index}]]')">
+            <i class="fa-solid fa-x"></i>
+        </button>
+        <script th:if="${toast.getLevel().name().equals('INFO') || toast.getLevel().name().equals('SUCCESS')}"
+            type="application/javascript">
+            setTimeout(() => prostLib.transitions.slideOffScreen('#toast_message-[[${toastStat.index}]]'), 3000);
+        </script>
+    </div>
+</div>

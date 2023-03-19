@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta th:replace="include/head">
+    <title>Prost!</title>
+</head>
+<body>
+<div th:replace="include/navbar"></div>
+<main class="content-container flex flex-col text-black text-center">
+    <div class="prost-bg flex flex-col items-center justify-center gap-5 py-16">
+        <h1 class="text-5xl font-bold">We serve drinks 🍺<br />& memories 🍻</h1>
+        <p class="text-lg">
+            <i>“The mouth of a perfectly happy man is filled with beer.”</i><br />
+            What are you waiting for? join us and order now!
+        </p>
+        <a
+            sec:authorize="isAnonymous()"
+            class="btn-primary font-bold"
+            style="padding: 12px 30px;"
+            href="/register"
+        >Register
+        </a>
+    </div>
+    <div class="p-5 flex flex-col justify-center">
+        <h2 class="text-3xl font-bold">Happiness is a choice, so is getting drunk!</h2>
+        <p>
+            Choose from our great collection of alcholic and non-alcholic beverages.
+            We got you, whatever your like!
+        </p>
+        <div th:replace="components/beercards"></div>
+    </div>
+</main>
+<footer th:replace="include/footer"></footer>
+</body>
+</html>

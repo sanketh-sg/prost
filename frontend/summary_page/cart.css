@@ -1,0 +1,81 @@
+.cart-items-wrapper {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+
+    .cart-items-wrapper__items {
+        margin-left: 2em;
+    }
+
+    @media only screen and (max-width: 768px) {
+        .cart-items-wrapper__items {
+            margin-left: 0;
+        }
+    }
+
+    .cart-item-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-bottom: 2em;
+
+        .cart-item {
+            @apply rounded-xl shadow-lg;
+            display: flex;
+            flex-direction: row;
+            background-color: white;
+            width: 300px;
+
+            .cart-item__picture {
+                @apply rounded-xl;
+                background-color: var(--primary-color);
+                height: 150px;
+                min-width: 100px;
+                width: 50%;
+
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+
+                & > img {
+                    @apply shadow;
+                    margin: 0 auto;
+                    max-width: 90%;
+                    max-height: 110%;
+                    object-fit: scale-down;
+                }
+            }
+
+            .cart-item__details {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 1em;
+                width: 100%;
+                min-width: 150px;
+                color:black;
+            }
+        }
+
+        .cart-item-row__buttons {
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .cart-item-button {
+                @apply rounded-lg shadow hover:bg-slate-100;
+                background-color: white;
+                border: 3px solid var(--primary-color);
+                color: var(--primary-color);
+
+                padding: 3px 15px;
+                margin-bottom: 10px;
+
+                transition: background-color ease-in-out 200ms;
+            }
+        }
+    }
+}

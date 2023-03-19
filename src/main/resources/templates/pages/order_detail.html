@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title th:text="'Order ' + ${order.id}"></title>
+    <meta th:replace="include/head">
+</head>
+<body class="prost-bg">
+<div th:replace="include/navbar"></div>
+<main class="content-container flex flex-row justify-center py-5 text-black">
+    <div class="flex flex-col">
+        <div class="bg-white p-3 rounded-xl shadow">
+            <div class="flex flex-row gap-3 mb-2">
+                <a class="btn-primary" href="/orders"><i class="fa-solid fa-arrow-left"></i> All orders</a>
+                <h1 class="font-bold text-2xl">Order summation</h1>
+            </div>
+            <hr class="mb-5" />
+            <div class="flex flex-row justify-center text-lg mb-5">
+                <div class="flex flex-col px-5">
+                    Order number:
+                </div>
+                <div class="flex flex-col px-5">
+                    <strong th:text="${order.id}"></strong>
+                </div>
+            </div>
+            <div class="flex flex-row justify-center text-lg mb-5">
+                <div class="flex flex-col px-5">
+                    Total price:
+                </div>
+                <div class="flex flex-col px-5">
+                    <strong th:text="'€' + ${order.price}"></strong>
+                </div>
+            </div>
+            <div class="flex flex-row justify-start text-lg">
+                <div class="flex flex-col px-5">
+                    Items:
+                </div>
+                <div class="flex flex-col px-5"></div>
+            </div>
+            <div class="ml-5 flex flex-row justify-between gap-5" th:each="bev : ${cartDTO.beverages}" th:with="beverage=${bev.key},count=${bev.value}">
+                <div class="flex flex-row">
+                    <img style="height: 150px;" th:alt="${beverage.getName()}" th:src="${beverage.getPicture()}">
+                    <div class="flex flex-col px-5" th:text="${count} + 'x'"></div>
+                    <strong th:text="${beverage.getName()}"></strong>
+                </div>
+                <span>à <strong th:text="'€' + ${beverage.getPrice()}"></strong></span>
+                <hr>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="include/footer"></footer>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Prost - Group 6 project
+# Prost
 
 # Technical
 Java version: **17**

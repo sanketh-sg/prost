@@ -80,6 +80,51 @@ Mechanism, as written:
 - Downloaded to a local path, attached via `MimeMultipart` alongside a
   `"PFA Order details"` text part, then deleted after sending.
 
+### The intended payload (recovered from `Send/`)
+
+The deleted `Send/` directory — an abandoned working copy, further along than the
+committed app — contained the invoice request that `AdminController` never
+finished. Recovered here because it is the only record of the intended contract:
+
+```java
+@GetMapping("/send_data")
+public ResponseEntity<String> sendData(
+        @RequestParam String user,
+        @RequestParam String amount,
+        @RequestParam String date,
+        @RequestParam String order_id,
+        @RequestParam String address,
+        @RequestParam String products)
+```
+
+It serialized those six fields to JSON with Jackson and POSTed them to
+`http://localhost:8081/` via a `RestTemplate`:
+
+```json
+{
+  "user": "...",
+  "order_id": "...",
+  "amount": "...",
+  "date": "...",
+  "address": "...",
+  "products": "..."
+}
+```
+
+`Send/` also registered a `RestTemplate` `@Bean` in `ApplicationMain` and had a
+`test_invoice` endpoint that printed `GOOGLE_APPLICATION_CREDENTIALS` and
+rendered a `pages/test_invoice` template. That template never existed in the
+committed application.
+
+Note what this payload implies: the function was expected to *generate* the
+invoice from these fields, not fetch a pre-existing `Invoice.pdf` from a bucket
+as `SendEmail` actually did. The two halves of the feature were designed against
+different contracts and never reconciled — which is why neither worked.
+
+Every field here is a flat `String`, including `products`. A rebuild should send
+the order id alone and let the server load the order, rather than trusting six
+client-supplied strings for a financial document.
+
 ### Known defects
 
 - **`Invoice.service()` ignored its request entirely.** It wrote

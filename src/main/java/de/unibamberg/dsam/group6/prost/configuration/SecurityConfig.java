@@ -24,9 +24,10 @@ public class SecurityConfig {
 
     @Bean
     @Profile("dev")
-    public SecurityFilterChain securityFilterChainProd(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(req -> {
             req.antMatchers("/cart/**", "/orders/**", "/user/**").authenticated();
+            req.antMatchers("/admin/**").hasRole("ADMIN");
             req.anyRequest().permitAll();
         });
         http.formLogin(form -> {
@@ -47,7 +48,7 @@ public class SecurityConfig {
 
     @Bean
     @Profile("prod")
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChainProd(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(req -> {
             req.antMatchers("/cart/**", "/orders/**", "/user/**").authenticated();
             req.antMatchers("/admin/**").hasRole("ADMIN");

@@ -250,16 +250,30 @@ git gc --prune=now --aggressive
 
 - [ ] **Step 5: Verify the credentials are gone from all history**
 
-Check by path **and** by content — a path check alone would have missed the password inside `SendEmail.java`:
+Check by path **and** by content — a path check alone would miss a credential embedded in source, which is exactly how the Gmail app password inside `SendEmail.java` was nearly shipped.
 
 ```bash
 git log --all --oneline -- sendgrid.env "src/main/resources/static/maximal-radius-375114-c8c681e93685.json"
 git rev-list --all | xargs -I{} git ls-tree -r {} --name-only | sort -u | grep -ciE 'sendgrid|maximal-radius|SendEmail'
-git log --all --oneline -S "BEGIN PRIVATE KEY"
-git log --all --oneline -S "xwmisbkrycurxtsg"
 ```
 
-Expected: no commits from the first, `0` from the second, and no commits from either content search.
+Expected: no commits from the first, `0` from the second.
+
+For the content check, read the literal out of the old commit rather than writing it into this file — pasting a credential into documentation puts it right back into the repository you are cleaning:
+
+```bash
+SECRET=$(git show <pre-purge-sha>:invoicing-function/src/main/java/de/unibamberg/dsam/group6/invoicingfunction/SendEmail.java \
+         | sed -n 's/.*password = "\([^"]*\)".*/\1/p')
+git log --all --oneline -S "$SECRET"
+git log --all --oneline -S "BEGIN PRIVATE KEY"
+```
+
+Expected: no commits from either.
+
+Two traps, both of which produced false positives during the real run:
+
+1. Any doc in the repo that quotes the search string will itself match. If a hit resolves to a file under `docs/`, it is your own verification text, not a leak — but remove it anyway.
+2. `-S` reports any change in occurrence count, so the commit that *deletes* a secret matches just as the commit that added it does. Confirm the direction with `git show <sha> -- <path>` before concluding anything.
 
 - [ ] **Step 6: Run Task 4 before pushing**
 

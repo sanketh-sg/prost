@@ -199,6 +199,15 @@ history purge follows."
 
 The repository has exactly two commits at this point (the original `initial comment` plus Task 1), one branch, and no collaborators. `git filter-repo` is unnecessary — a root rebase is enough. The owner has approved the force-push.
 
+**Three credentials must leave history, not two.** The Gmail address and app password are string literals inside
+`invoicing-function/src/main/java/de/unibamberg/dsam/group6/invoicingfunction/SendEmail.java`, not in a standalone
+credential file. Task 4 deletes that directory, but an ordinary `git rm` never removes anything from history — so
+`SendEmail.java` must be purged here, in the same pass as the other two files.
+
+Purging `invoicing-function/` removes it from the working tree as well, which breaks the build until
+`settings.gradle` drops its `include` line. **Task 4 must therefore run immediately after this task, before the
+force-push**, so the pushed state is coherent.
+
 - [ ] **Step 1: Create a safety backup branch**
 
 ```bash
@@ -216,15 +225,20 @@ git log --all --oneline -- sendgrid.env "src/main/resources/static/maximal-radiu
 
 Expected: at least one commit listed. If empty, skip to Step 6.
 
-- [ ] **Step 3: Rewrite every commit without the two files**
+- [ ] **Step 3: Rewrite every commit without the credential-bearing paths**
 
 ```bash
-git filter-branch --force --index-filter \
-  'git rm -r --cached --ignore-unmatch sendgrid.env "src/main/resources/static/maximal-radius-375114-c8c681e93685.json"' \
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter \
+  'git rm -r --cached --ignore-unmatch sendgrid.env "src/main/resources/static/maximal-radius-375114-c8c681e93685.json" invoicing-function' \
   --prune-empty --tag-name-filter cat -- --all
 ```
 
-`git filter-branch` prints a warning recommending `filter-repo`. For two commits and two paths it is fine and needs no extra tooling.
+`invoicing-function` is included because `SendEmail.java` carries the Gmail app password as a source literal. The
+whole directory goes rather than the single file — it is deleted in Task 4 regardless, so there is nothing to
+preserve.
+
+`git filter-branch` prints a warning recommending `filter-repo`. For two commits and three paths it is fine and
+needs no extra tooling; the env var suppresses the nag.
 
 - [ ] **Step 4: Expire the original refs**
 
@@ -236,20 +250,29 @@ git gc --prune=now --aggressive
 
 - [ ] **Step 5: Verify the credentials are gone from all history**
 
+Check by path **and** by content — a path check alone would have missed the password inside `SendEmail.java`:
+
 ```bash
 git log --all --oneline -- sendgrid.env "src/main/resources/static/maximal-radius-375114-c8c681e93685.json"
-git rev-list --all | xargs -I{} git ls-tree -r {} --name-only | sort -u | grep -ciE 'sendgrid|maximal-radius'
+git rev-list --all | xargs -I{} git ls-tree -r {} --name-only | sort -u | grep -ciE 'sendgrid|maximal-radius|SendEmail'
+git log --all --oneline -S "BEGIN PRIVATE KEY"
+git log --all --oneline -S "xwmisbkrycurxtsg"
 ```
 
-Expected: no commits listed, and `0`.
+Expected: no commits from the first, `0` from the second, and no commits from either content search.
 
-- [ ] **Step 6: Force-push**
+- [ ] **Step 6: Run Task 4 before pushing**
+
+Purging `invoicing-function/` leaves `settings.gradle` including a directory that no longer exists, so the build is
+broken until Task 4 lands. Complete Task 4 now, then return here.
+
+- [ ] **Step 7: Force-push**
 
 ```bash
 git push --force origin main
 ```
 
-- [ ] **Step 7: Delete the backup branch**
+- [ ] **Step 8: Delete the backup branch**
 
 ```bash
 git branch -D backup-before-purge

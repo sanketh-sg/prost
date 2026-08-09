@@ -2,9 +2,9 @@ package de.unibamberg.dsam.group6.prost;
 
 import static org.assertj.core.api.Assertions.*;
 
-import de.unibamberg.dsam.group6.prost.entity.Bottle;
 import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.service.Cart;
+import de.unibamberg.dsam.group6.prost.support.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,25 +31,12 @@ public class CartTest {
     void addTestToCart() {
         this.cart.clear();
 
-        // Bottle.name is constrained to \w+ — no spaces allowed.
-        this.firstId = this.bottles.save(newBottle("TestBottleA")).getId();
-        this.secondId = this.bottles.save(newBottle("TestBottleB")).getId();
+        this.firstId = TestData.saveBottle(this.bottles, "TestBottleA", 100).getId();
+        this.secondId = TestData.saveBottle(this.bottles, "TestBottleB", 100).getId();
         this.absentId = this.secondId + 1000L;
 
         this.cart.addToCart(this.firstId, 1);
         this.cart.addToCart(this.secondId, 3);
-    }
-
-    private static Bottle newBottle(String name) {
-        return Bottle.builder()
-                .name(name)
-                .bottlePic("https://example.invalid/bottle.png")
-                .volume(0.5)
-                .volumePercent(5.0)
-                .price(2.0)
-                .supplier("Test Supplier")
-                .inStock(100)
-                .build();
     }
 
     @Test

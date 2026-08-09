@@ -1,7 +1,7 @@
 # Prost - Group 6 project
 
 # Technical
-Java version: **17**
+Java version: **17** asdas
 ## Database
 Login credentials (set up in resources/application.yml):
 ```yaml

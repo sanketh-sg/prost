@@ -324,6 +324,26 @@ and recreated per run, so it is not at risk.
 **`javax` → `jakarta` breadth.** The change touches nearly every file. The
 compiler catches import errors; the Phase 3 suite catches behavioral ones.
 
+**Spring Session JDBC 2.x → 3.x.** Found while writing Phase 3; not in the
+original analysis. The app uses `spring-session-jdbc`, which stores sessions in a
+`SPRING_SESSION` table keyed by its own `SESSION` cookie rather than in the
+servlet session. Boot 3 moves this to Spring Session 3.x, which changes that
+schema, and `spring.session.jdbc.initialize-schema: always` applies the change on
+startup.
+
+This matters because the cart lives entirely in session state — a silent failure
+here empties every user's cart while the rest of the application looks healthy.
+
+`SessionPersistenceTest` covers it. It is the only test that runs with Spring
+Session enabled, driving requests through the real `SESSION` cookie and asserting
+both that the schema exists and that cart contents round-trip through the
+database. Every other integration test disables Spring Session via
+`@IntegrationTest`, because `MockMvc`'s `.session(...)` helper sets a servlet
+session the application never reads once Spring Session is active — which made
+every cart and login assertion fail for reasons unrelated to the behavior under
+test. If `SessionPersistenceTest` alone fails during Phase 4, the cause is the
+session store, not the controllers.
+
 **Thymeleaf extras compatibility.** Three separate cases, verified:
 
 - `thymeleaf-extras-springsecurity5` → `-springsecurity6`. Straightforward

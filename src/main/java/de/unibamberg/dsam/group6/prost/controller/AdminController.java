@@ -2,7 +2,6 @@ package de.unibamberg.dsam.group6.prost.controller;
 
 import de.unibamberg.dsam.group6.prost.entity.Bottle;
 import de.unibamberg.dsam.group6.prost.entity.Crate;
-import de.unibamberg.dsam.group6.prost.entity.Order;
 import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.repository.CratesRepository;
 import de.unibamberg.dsam.group6.prost.repository.OrdersRepository;
@@ -127,12 +126,5 @@ public class AdminController {
             this.errors.addToast(Toast.success("%s added successfully.", added.getName()));
         }
         return "redirect:" + next.orElse("/admin");
-    }
-
-    @PostMapping("/printPDF")
-    public String callSendEmail(@RequestParam Optional<String> op, @ModelAttribute Order order) {
-        //TODO Use RestController to make POST API Call to Cloud function
-
-        return "pages/admin";
     }
 }

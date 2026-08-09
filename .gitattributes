@@ -1,0 +1,16 @@
+# Normalize all text files to LF in the repository.
+# Spotless enforces LF, and core.autocrlf=input does not convert on checkout,
+# so without this a CRLF working tree fails spotlessJavaCheck.
+* text=auto eol=lf
+
+# Binary files — never convert.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.zip binary
+*.jar binary
+*.bin binary

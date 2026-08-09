@@ -1,7 +1,5 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
-import com.google.gson.JsonObject;
-import de.unibamberg.dsam.group6.prost.util.CartDTO;
 import java.util.*;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -62,21 +60,5 @@ public class Order {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
-
-    public JsonObject getStats() {
-        final var deliveryAddress = this.getUser().getDeliveryAddress();
-
-        final var items = new JsonObject();
-        CartDTO.fromOrder(this)
-                .beverages
-                .forEach((key, value) -> items.addProperty(key.getId().toString(), value));
-
-        final var obj = new JsonObject();
-        obj.addProperty("timestamp", this.createdOn.getTime());
-        obj.addProperty("postalCode", deliveryAddress == null ? "00000" : deliveryAddress.getPostalCode());
-        obj.add("orderItems", items);
-
-        return obj;
     }
 }

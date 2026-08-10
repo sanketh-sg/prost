@@ -7,7 +7,15 @@ plugins {
 
 group = 'de.unibamberg.dsam.group6'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+// sourceCompatibility on the project is a JavaPluginConvention, deprecated in
+// Gradle 8 and removed in 9. The toolchain block also makes Gradle provision a
+// matching JDK rather than relying on whatever JAVA_HOME happens to be.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 configurations {
     compileOnly {
@@ -63,7 +71,8 @@ dependencies {
 }
 
 bootJar {
-    archiveName "prost.jar"
+    // Gradle 8 removed archiveName in favour of archiveFileName.
+    archiveFileName = "prost.jar"
 }
 
 tasks.named('test') {

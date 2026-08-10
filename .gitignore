@@ -4,7 +4,7 @@ build/
 .gradle
 */.gradle
 /docs/*.html
-
+/docs/*.txt
 # Node
 node_modules/
 

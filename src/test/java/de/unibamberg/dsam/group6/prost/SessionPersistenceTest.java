@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -34,6 +35,12 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
 @WithMockUser(username = "admin", roles = "ADMIN")
+// Its own database, because it is necessarily its own Spring context. Two
+// contexts sharing one in-memory database collide: each boots with
+// ddl-auto: create and resets the sequences while the other still holds a
+// pre-allocated block of ids (Hibernate 6 allocates 50 at a time), producing
+// primary key violations that depend on test execution order.
+@TestPropertySource(properties = "spring.datasource.url=jdbc:h2:mem:prost-session")
 class SessionPersistenceTest {
     @Autowired
     MockMvc mvc;

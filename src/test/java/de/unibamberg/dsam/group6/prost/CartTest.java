@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.*;
 
 import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.service.Cart;
+import de.unibamberg.dsam.group6.prost.support.IntegrationTest;
 import de.unibamberg.dsam.group6.prost.support.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@IntegrationTest
 public class CartTest {
     @Autowired
     Cart cart;

@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+@Slf4j
 public class AdminController {
     private final UserErrorManager errors;
     private final AdminActionsProvider actions;
@@ -60,12 +62,20 @@ public class AdminController {
             @RequestParam(name = "a") Optional<String> action,
             @RequestParam Optional<Boolean> await,
             @RequestParam Optional<String> next) {
+        // Every exit below reports. Actions are resolved by reflection from a query
+        // parameter, so a typo is routine — and a bare redirect looks exactly like
+        // success, which is how a mistyped action reads as "it worked, but nothing
+        // happened".
         if (action.isEmpty()) {
+            log.warn("Admin action requested with no 'a' parameter");
+            this.errors.addToast(Toast.error("No action specified."));
             return "redirect:" + next.orElse("/admin");
         }
 
         var a = action.get().split("::");
         if (a.length != 2) {
+            log.warn("Malformed admin action '{}'", action.get());
+            this.errors.addToast(Toast.error("Malformed action '%s'. Expected 'instance::method'.", action.get()));
             return "redirect:" + next.orElse("/admin");
         }
 
@@ -73,6 +83,8 @@ public class AdminController {
                 .filter(i -> i.getInstanceName().equals(a[0]))
                 .toList();
         if (instance.size() != 1) {
+            log.warn("Unknown admin action instance '{}'", a[0]);
+            this.errors.addToast(Toast.error("Unknown action instance '%s'.", a[0]));
             return "redirect:" + next.orElse("/admin");
         }
 

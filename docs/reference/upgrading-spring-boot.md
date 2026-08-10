@@ -279,6 +279,43 @@ The `dev` profile hides this completely: H2 is in-memory with `ddl-auto: create`
 every run and therefore always self-consistent. It surfaces only against a persistent
 database — which is precisely why Flyway lands before Boot 3 ever touches Postgres.
 
+#### Decision: Option B
+
+**Chosen 2026-08-09, before Hop 2.** The entities are left untouched; Hibernate 6's
+per-entity sequences are accepted, and `V1__initial_schema.sql` creates them.
+
+The reasoning is worth recording, because it is the reasoning and not the conclusion that
+transfers to the next project.
+
+*The entire case for Option A is protecting existing data. Verified: there is no existing
+data anywhere.*
+
+- No `db_data/` volume — the `docker-compose` Postgres has never been started
+- Docker is not running on this machine
+- The GCP project is dead and the application was never deployed with real data
+
+The collision scenario requires a **populated** database. There isn't one. Choosing Option
+A would have meant adding `@GenericGenerator` — a Hibernate-specific annotation, deprecated
+in Hibernate 6.2+ — to six entity classes permanently, to solve a problem that does not
+exist here, and then re-fighting it at Hibernate 7.
+
+Option B also removes a real if minor flaw: a single shared sequence is a contention point
+that every insert into every table serialises on.
+
+**The generalisable lesson.** The honest answer to "how do I handle this breaking change?"
+is sometimes *confirm it does not apply to you*. A generic migration checklist would have
+produced `@GenericGenerator` across six files for nothing. Check whether the precondition
+holds before paying the cost of the mitigation.
+
+**What this makes non-optional.** With Option B the per-entity sequences must exist before
+the first insert. Flyway therefore stops being a precaution and becomes a hard requirement
+of Hop 3, and `V1__initial_schema.sql` must be generated from **Hibernate 6**, never
+carried over from the Hibernate 5 output captured during pre-flight.
+
+**If this project is ever pointed at a database that does hold data** — a colleague's
+dump, a restored backup — Option B no longer applies to it, and the sequences must be
+created with `start with (max(id) + 1)` rather than 1.
+
 ### 2.3 Spring Security 6 — the config rewrite
 
 Two mechanical changes that together touch every line of `SecurityConfig`.
@@ -432,10 +469,10 @@ rewritten. Preserve the rules exactly — this is not the moment to improve them
 **Hibernate 5 → 6.** The subtle part. Remove obsolete properties such as
 `hibernate.jdbc.lob.non_contextual_creation`, and expect schema generation to differ.
 
-**Decide the ID-generation strategy here, not later.** See §2.2 — `GenerationType.AUTO`
-changes from one shared `hibernate_sequence` to a sequence per entity. Six entities are
-affected. The choice determines what the Flyway baseline in Hop 3 has to contain, so make
-it now.
+**ID generation: nothing to do here.** `GenerationType.AUTO` changes from one shared
+`hibernate_sequence` to a sequence per entity, but Option B was chosen (see §2.2), so the
+six affected entities are left untouched. The consequence lands in Hop 3: the Flyway
+baseline must create those per-entity sequences.
 
 **Thymeleaf.** Swap `springsecurity5` → `springsecurity6`, delete `java8time`, and resolve
 `nl2br` per the decision made in §1.6.
@@ -453,10 +490,12 @@ Flyway converts the schema into versioned SQL you can review in a pull request.
    `spring.jpa.properties.javax.persistence.schema-generation.scripts`.
 2. Copy it to `src/main/resources/db/migration/V1__initial_schema.sql`.
 3. **Strip every `drop` statement** — migrations must be additive.
-   Check the sequences carefully against the decision from §2.2: a Hibernate 6 baseline
-   emits `address_seq`, `beverage_seq`, `orders_seq` and so on, where Hibernate 5 emitted
-   a single `hibernate_sequence`. Against a database with existing rows, any new sequence
-   must start above the current `max(id)`, never at 1.
+   **Confirm the per-entity sequences are present.** Per the Option B decision in §2.2, the
+   baseline must contain `address_seq`, `beverage_seq`, `orders_seq`, `order_items_seq`,
+   `privileges_seq` and `roles_seq` — *not* the single `hibernate_sequence` that Hibernate
+   5 emitted. If the file contains `hibernate_sequence`, it was generated before the Boot 3
+   hop and must be regenerated. Starting each at 1 is correct here only because no database
+   holds data; against existing rows they must start above `max(id)`.
 4. Prod moves to `ddl-auto: validate` with `flyway.enabled: true`.
 5. Dev keeps `ddl-auto: create` on in-memory H2 with `flyway.enabled: false`, so tests
    stay fast and the schema is rebuilt per run.

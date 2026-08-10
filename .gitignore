@@ -3,6 +3,7 @@ build/
 */build/
 .gradle
 */.gradle
+/docs/*.html
 
 # Node
 node_modules/

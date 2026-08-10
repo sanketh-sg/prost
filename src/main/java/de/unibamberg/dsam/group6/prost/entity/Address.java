@@ -2,10 +2,10 @@ package de.unibamberg.dsam.group6.prost.entity;
 
 import static java.lang.String.format;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

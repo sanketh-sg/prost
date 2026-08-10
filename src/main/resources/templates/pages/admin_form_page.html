@@ -18,10 +18,10 @@
         </th:block>
         <div th:if="${param.get('type') == null}" class="flex flex-col text-center gap-3">
             <h2>Form types:</h2>
-            <a class="btn-primary" th:href="@{${#httpServletRequest.getRequestURI()}(type='bottle')}">
+            <a class="btn-primary" th:href="@{${currentUri}(type='bottle')}">
                 Bottle
             </a>
-            <a class="btn-primary" th:href="@{${#httpServletRequest.getRequestURI()}(type='crate')}">
+            <a class="btn-primary" th:href="@{${currentUri}(type='crate')}">
                 Crate
             </a>
         </div>

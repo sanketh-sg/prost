@@ -10,11 +10,6 @@ spring:
             max-active: 5
             max-idle: 5
     jpa:
-        properties:
-            hibernate:
-                jdbc:
-                    lob:
-                        non_contextual_creation: true
         hibernate:
             ddl-auto: update
     thymeleaf:

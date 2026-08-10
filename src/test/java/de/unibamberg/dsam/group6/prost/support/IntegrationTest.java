@@ -28,11 +28,19 @@ import org.springframework.test.context.TestPropertySource;
  * <p>Set as a property rather than a {@code src/test/resources/application-dev.yml}
  * file: that filename would shadow the real dev profile config instead of
  * merging with it.
+ *
+ * <p>Boot 3 removed {@code spring.session.store-type}, which is what previously
+ * disabled Spring Session here. Unknown properties are ignored silently rather
+ * than failing, so the upgrade re-enabled Spring Session without any warning and
+ * every cart assertion broke. Excluding the auto-configuration is the Boot 3
+ * equivalent and cannot fail quietly — a wrong class name throws at startup.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
-@TestPropertySource(properties = "spring.session.store-type=none")
+@TestPropertySource(
+        properties =
+                "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.session.SessionAutoConfiguration")
 public @interface IntegrationTest {}

@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.5'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.0.13'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'com.diffplug.spotless' version '6.11.0'
 }
 
@@ -52,9 +52,10 @@ dependencies {
     //endregion
 
     //region thymeleaf
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'com.github.bufferings:thymeleaf-extras-nl2br:1.0.2'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+    // thymeleaf-extras-java8time removed: the Java8TimeDialect bean was registered
+    // but no template uses temporals.*, and the dialect is folded into Thymeleaf 3.1.
     //endregion
 
     implementation 'org.hibernate.validator:hibernate-validator'

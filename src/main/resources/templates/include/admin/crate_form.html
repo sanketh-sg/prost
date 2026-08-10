@@ -9,7 +9,7 @@
 <form action="/admin/addCrate" method="post" th:object="${crate}">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
     <input type="hidden" name="next"
-           th:value="${#httpServletRequest.getRequestURI()} + '?' + ${#httpServletRequest.getQueryString()}"
+           th:value="${currentUrl}"
     >
     <div class="form">
         <div class="form__row">

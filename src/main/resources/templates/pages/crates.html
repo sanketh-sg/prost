@@ -11,8 +11,7 @@
         <div class="flex justify-end gap-5 pb-5">
             <a
                 class="btn-primary flex flex-col justify-center"
-                th:href="@{/admin/form(type='crate', from=${#httpServletRequest.getRequestURI()} +
-                    ${#httpServletRequest.getQueryString() == null ? '' : '?' + #httpServletRequest.getQueryString()})}">
+                th:href="@{/admin/form(type='crate', from=${currentUrl})}">
                 <span>
                     <i class="fa-solid fa-shopping-basket"></i>&ensp;
                     Add crate

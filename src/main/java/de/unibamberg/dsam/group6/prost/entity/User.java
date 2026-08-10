@@ -1,10 +1,10 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
 import de.unibamberg.dsam.group6.prost.util.annotation.IsAfter;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.*;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.format.annotation.DateTimeFormat;

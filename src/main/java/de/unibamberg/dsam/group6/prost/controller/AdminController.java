@@ -11,9 +11,9 @@ import de.unibamberg.dsam.group6.prost.service.UserErrorManager;
 import de.unibamberg.dsam.group6.prost.service.admin.VersionReader;
 import de.unibamberg.dsam.group6.prost.util.Toast;
 import de.unibamberg.dsam.group6.prost.util.exception.CallFailedException;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +37,11 @@ public class AdminController {
             @RequestParam(name = "p") Optional<String> page, @RequestParam Optional<String> username, Model model) {
         model.addAttribute("actions", this.actions.getAnnotatedInstances());
         model.addAttribute("version", this.version.getVersion());
+
+        // Thymeleaf 3.1 removed #request, so the templates can no longer read these
+        // query parameters themselves. They are already bound as method arguments.
+        model.addAttribute("selectedPanel", page.orElse(""));
+        model.addAttribute("selectedUsername", username.orElse(""));
 
         if (page.isPresent() && page.get().equals("orders")) {
             model.addAttribute("all_users", this.userRepository.getAllUsernamesHavingOrders());

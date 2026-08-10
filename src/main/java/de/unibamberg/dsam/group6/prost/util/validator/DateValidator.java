@@ -1,9 +1,9 @@
 package de.unibamberg.dsam.group6.prost.util.validator;
 
 import de.unibamberg.dsam.group6.prost.util.annotation.IsAfter;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class DateValidator implements ConstraintValidator<IsAfter, LocalDate> {
     private int year;

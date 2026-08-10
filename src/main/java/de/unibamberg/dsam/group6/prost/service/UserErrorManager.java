@@ -1,10 +1,10 @@
 package de.unibamberg.dsam.group6.prost.service;
 
 import de.unibamberg.dsam.group6.prost.util.Toast;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

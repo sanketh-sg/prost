@@ -62,7 +62,7 @@
                 <p class="break-words text-center" nl2br:text="${version}"></p>
             </div>
 
-            <div th:if="${!@environment.acceptsProfiles('prod') && #strings.equals(#request.getParameter('p'), 'h2-console')}" class="admin-widget text-center">
+            <div th:if="${!@environment.acceptsProfiles('prod') && #strings.equals(selectedPanel, 'h2-console')}" class="admin-widget text-center">
                 <iframe height="500" width="800" src="/h2-console"></iframe>
                 <span>
                     Url: <code>jdbc:h2:mem:prost</code>&emsp;
@@ -71,7 +71,7 @@
                 </span>
             </div>
 
-            <div th:if="${#strings.equals(#request.getParameter('p'), 'orders')}" class="admin-widget text-center">
+            <div th:if="${#strings.equals(selectedPanel, 'orders')}" class="admin-widget text-center">
                 <div th:replace="include/admin/user_orders"></div>
             </div>
         </div>

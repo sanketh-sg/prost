@@ -24,10 +24,7 @@
                 <input name="beverageId" th:value="${beverage.getId()}" type="hidden">
                 <input name="next"
                        th:value="
-                           ${#httpServletRequest.getRequestURI()} + ${#httpServletRequest.getQueryString() == null ?
-                                '' :
-                                '?' + #httpServletRequest.getQueryString()
-                       }"
+                           ${currentUrl}"
                        type="hidden">
                 <div class="flex flex-row justify-end">
                     <div class="beverage-to-cart py-3">

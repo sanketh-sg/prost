@@ -1,11 +1,14 @@
-# Upgrading Prost: Spring Boot 2.7 → 3.5, Java 17 → 21
+# Upgrading Prost: Spring Boot 2.7 → 3.5 (staying on Java 17)
 
 A working reference for this repository, written to be read start to finish once and
 then dipped into later. It covers what has to be true before an upgrade begins, how
 the upgrade itself is sequenced, and how each step is proven.
 
-Written 2026-08-09, at commit `aeaebe6`, with Phases 0–3 complete and the upgrade
-itself not yet started.
+Written 2026-08-09 and updated as each hop landed. The Boot upgrade is **complete**:
+Gradle 8.5, Spring Boot 3.5.0, Hibernate 6.6, Spring Security 6.5, Tomcat 10.1,
+Thymeleaf 3.1, with Flyway owning the prod schema.
+
+**Java 21 was deliberately not taken** — see §3.5.
 
 ---
 
@@ -186,8 +189,8 @@ this repository, as of `aeaebe6`:
 | `spring-security-test` | **Bug:** declared `implementation`, so test-only code ships in the production jar. Should be `testImplementation`. Fix before upgrading |
 | `hibernate-validator` (direct) | Prefer `spring-boot-starter-validation` so Boot manages the version |
 | `postgresql`, `commons-lang3`, `jackson-core` | Version-managed, no action |
-| `lombok` | Needs 1.18.30+ for Java 21; Boot 3.5 manages a suitable version |
-| `spotless` 6.11.0 | Verified fine on Gradle 8.5; may still need a bump for Java 21 |
+| `lombok` | Boot 3.5 manages a suitable version. 1.18.30+ would be needed only if Java 21 is taken later |
+| `spotless` 6.11.0 | Verified fine on Gradle 8.5 and Boot 3.5. Untested on Java 21, which was not taken |
 | `bootJar { archiveName }` | Removed in Gradle 8 → `archiveFileName` |
 | `sourceCompatibility = '17'` | → Gradle `java { toolchain { ... } }` block |
 
@@ -566,7 +569,7 @@ The first invocation updates `gradle-wrapper.properties`; the second regenerates
 wrapper scripts and jar *using* the new version.
 
 Then fix what Gradle 8 removed: `archiveName` → `archiveFileName`, and
-`sourceCompatibility` → a toolchain block (keep it at 17 for now; Java 21 is its own hop).
+`sourceCompatibility` → a toolchain block, pinned to 17. The toolchain form is what makes a later Java 21 move a one-line change (§3.5).
 
 **Outcome, verified at commit `b2072e3`.** Both predicted fixes were the only ones needed.
 The Boot **2.7.5** plugin runs on Gradle 8.5 without complaint — worth stating explicitly,
@@ -580,8 +583,9 @@ Two leftovers, neither a problem:
   carry no file or line attribution, which is how you can tell they originate inside a
   plugin rather than the build script — the Boot 2.7.5 plugin predates Gradle 8. They
   clear when Boot upgrades. Do not mistake them for damage caused by a later hop.
-- **Spotless 6.11.0 needed no bump** for Gradle 8, contrary to the caution in §1.5. Java 21
-  is still untested.
+- **Spotless 6.11.0 needed no bump** for Gradle 8, contrary to the caution in §1.5. It
+  went on to need none for Boot 3.5 either. It remains untested on Java 21, which was not
+  taken (§3.5).
 
 When documentation does not answer a compatibility question cleanly, prefer a two-minute
 experiment to a confident guess. A wrapper change is one file and trivially reverted.
@@ -638,12 +642,55 @@ Flyway converts the schema into versioned SQL you can review in a pull request.
 5. Dev keeps `ddl-auto: create` on in-memory H2 with `flyway.enabled: false`, so tests
    stay fast and the schema is rebuilt per run.
 
-### Hops 4–6 — Boot 3.5, Java 21, frontend
+### Hop 4 — Boot 3.0.13 → 3.5.0
 
-Small. Boot 3.0 → 3.5 is a minor-version walk. Java 21 is one toolchain line now that the
-Dockerfile and CI are deleted. The frontend needs only
-`npx update-browserslist-db@latest` to clear a stale `caniuse-lite` warning — Webpack 5
-builds clean on Node 26, verified.
+A minor-version walk, and the only hop that required **no source changes at all**. Tests
+came out byte-identical to baseline on the first run, and the full flow verified on a
+running instance.
+
+It did surface one thing: Spring Security 6.5 marks `AntPathRequestMatcher` **deprecated
+for removal** — the very matcher adopted in Hop 2 to fix the multi-servlet startup failure
+and to preserve pre-upgrade path-matching semantics.
+
+It was deliberately left in place. Replacing it changes how authorization paths are
+matched, and folding a behaviour-sensitive change into a version bump reintroduces the
+ambiguity this whole sequence exists to prevent. Deprecated is not broken. The replacement
+is `PathPatternRequestMatcher`, and it deserves its own commit with its own verification.
+
+### Hop 5 — Java 17 → 21: **not taken**
+
+**Decision, 2026-08-10: stay on Java 17.**
+
+The machine had only JDK 17 installed, and Gradle 8.5 will not provision a toolchain
+without a resolver plugin. That left three options: add the Foojay resolver so Gradle
+downloads a JDK 21 automatically, install one by hand, or stop at 17.
+
+Stopping was chosen, and it is a defensible engineering position rather than a shortcut:
+
+- **Java 17 is an LTS supported into 2029.** Nothing is end-of-life, unlike Boot 2.7 was.
+- **Boot 3.5 runs on 17.** The floor is 17; 21 is optional.
+- **The upgrade's actual goal was reaching a supported framework**, and that is done.
+- Java 21's benefits here — virtual threads, pattern matching — are features this codebase
+  does not currently use. Taking a runtime bump to enable nothing is cost without return.
+
+**To take it later**, the whole change is one line, because the Dockerfile and CI are gone:
+
+```gradle
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+```
+
+plus a JDK 21 that Gradle can find. Add `id 'org.gradle.toolchains.foojay-resolver-convention'`
+to `settings.gradle` if you would rather Gradle fetch it than install one. Then re-run
+Part 4's six verification layers — nothing about them is version-specific.
+
+### Hop 6 — Frontend browser data
+
+The frontend needs only `npx update-browserslist-db@latest` to clear a stale
+`caniuse-lite` warning — Webpack 5 builds clean on Node 26, verified.
 
 ---
 
@@ -692,7 +739,7 @@ appears only at runtime.
 npx pnpm build && ./gradlew bootRun
 ```
 
-Confirm the banner reads Boot 3.5 on Java 21, then walk the full baseline table from
+Confirm the banner reads Boot 3.5 on Java 17, then walk the full baseline table from
 §1.1. Pay particular attention to `/`, `/login`, `/admin`, and `/cart`, which are the
 pages using `sec:` or `nl2br`.
 

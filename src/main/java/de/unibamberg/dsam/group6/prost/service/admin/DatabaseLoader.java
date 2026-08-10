@@ -7,13 +7,13 @@ import de.unibamberg.dsam.group6.prost.util.annotation.AdminAction;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +51,7 @@ public class DatabaseLoader {
                 .append(this.action__importCrates().get())
                 .append(System.lineSeparator());
 
-        return new AsyncResult<>(sb.toString());
+        return CompletableFuture.completedFuture(sb.toString());
     }
 
     private Role createRoleIfNotFound(String name, Set<Privilege> privileges) {
@@ -96,7 +96,7 @@ public class DatabaseLoader {
                     .build());
         });
         this.userRepository.flush();
-        return new AsyncResult<>("Users imported successfully.");
+        return CompletableFuture.completedFuture("Users imported successfully.");
     }
 
     @Async
@@ -114,7 +114,7 @@ public class DatabaseLoader {
                     .build());
         });
         this.bottlesRepository.flush();
-        return new AsyncResult<>("Bottles imported successfully.");
+        return CompletableFuture.completedFuture("Bottles imported successfully.");
     }
 
     @Async
@@ -139,7 +139,7 @@ public class DatabaseLoader {
             iter++;
         }
         this.cratesRepository.flush();
-        return new AsyncResult<>("Crates imported successfully");
+        return CompletableFuture.completedFuture("Crates imported successfully");
     }
 
     @Async
@@ -148,6 +148,6 @@ public class DatabaseLoader {
         this.userRepository.deleteAll();
         this.bottlesRepository.deleteAll();
 
-        return new AsyncResult<>("Cleared successfully.");
+        return CompletableFuture.completedFuture("Cleared successfully.");
     }
 }

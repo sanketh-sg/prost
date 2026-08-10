@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -86,15 +87,19 @@ public class SecurityConfig {
             h.httpStrictTransportSecurity(hsts -> {});
             h.frameOptions(frame -> frame.sameOrigin());
         });
-        http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
+        // requiresChannel() was deprecated in Security 6.5; redirectToHttps() is the
+        // documented replacement. With no matcher configured it applies to every
+        // request, matching the previous anyRequest().requiresSecure().
+        http.redirectToHttps(Customizer.withDefaults());
         return http.build();
     }
 
     @Bean
     public AuthenticationProvider daoAuthenticationProvider() {
-        var provider = new DaoAuthenticationProvider();
+        // Security 6.5 deprecated the no-arg constructor and setUserDetailsService;
+        // the UserDetailsService is now a constructor argument.
+        var provider = new DaoAuthenticationProvider(this.detailsService);
         provider.setPasswordEncoder(this.passwordEncoder());
-        provider.setUserDetailsService(this.detailsService);
         return provider;
     }
 

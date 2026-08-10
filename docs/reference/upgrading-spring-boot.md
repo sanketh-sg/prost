@@ -187,7 +187,7 @@ this repository, as of `aeaebe6`:
 | `hibernate-validator` (direct) | Prefer `spring-boot-starter-validation` so Boot manages the version |
 | `postgresql`, `commons-lang3`, `jackson-core` | Version-managed, no action |
 | `lombok` | Needs 1.18.30+ for Java 21; Boot 3.5 manages a suitable version |
-| `spotless` 6.11.0 | May need a bump for Gradle 8 / Java 21 |
+| `spotless` 6.11.0 | Verified fine on Gradle 8.5; may still need a bump for Java 21 |
 | `bootJar { archiveName }` | Removed in Gradle 8 → `archiveFileName` |
 | `sourceCompatibility = '17'` | → Gradle `java { toolchain { ... } }` block |
 
@@ -392,6 +392,24 @@ wrapper scripts and jar *using* the new version.
 
 Then fix what Gradle 8 removed: `archiveName` → `archiveFileName`, and
 `sourceCompatibility` → a toolchain block (keep it at 17 for now; Java 21 is its own hop).
+
+**Outcome, verified at commit `b2072e3`.** Both predicted fixes were the only ones needed.
+The Boot **2.7.5** plugin runs on Gradle 8.5 without complaint — worth stating explicitly,
+because Boot 2.7's documented support matrix stops at Gradle 7.x, which makes this look
+riskier than it is. The build failed on the removed `archiveName` property alone, having
+already evaluated the plugin successfully. Tests came out byte-identical to the baseline.
+
+Two leftovers, neither a problem:
+
+- **Three `Convention`-type deprecations remain**, scheduled for removal in Gradle 9. They
+  carry no file or line attribution, which is how you can tell they originate inside a
+  plugin rather than the build script — the Boot 2.7.5 plugin predates Gradle 8. They
+  clear when Boot upgrades. Do not mistake them for damage caused by a later hop.
+- **Spotless 6.11.0 needed no bump** for Gradle 8, contrary to the caution in §1.5. Java 21
+  is still untested.
+
+When documentation does not answer a compatibility question cleanly, prefer a two-minute
+experiment to a confident guess. A wrapper change is one file and trivially reverted.
 
 ### Hop 2 — Boot 2.7.5 → 3.0.13
 

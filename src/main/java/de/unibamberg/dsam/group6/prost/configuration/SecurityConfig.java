@@ -1,6 +1,6 @@
 package de.unibamberg.dsam.group6.prost.configuration;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.withDefaults;
 
 import de.unibamberg.dsam.group6.prost.service.UserDetailSecurityService;
 import de.unibamberg.dsam.group6.prost.service.UserErrorManager;
@@ -28,19 +28,20 @@ public class SecurityConfig {
     @Bean
     @Profile("dev")
     public SecurityFilterChain securityFilterChainDev(HttpSecurity http) throws Exception {
-        // antMatcher(...) rather than the String overload, for two reasons.
+        // Matchers are explicit rather than bare Strings because the dev profile
+        // registers the H2 console servlet, and with more than one mappable servlet
+        // Security refuses to guess what a String means and fails startup.
         //
-        // 1. Correctness: this chain previously used antMatchers(), which is always an
-        //    AntPathRequestMatcher. Security 6's String overload resolves to an
-        //    MvcRequestMatcher instead, which matches differently — being explicit keeps
-        //    the pre-upgrade semantics.
-        // 2. It is required here anyway: the dev profile registers the H2 console
-        //    servlet, and with more than one mappable servlet Security 6 refuses to
-        //    guess which matcher a bare String means, failing startup.
+        // PathPatternRequestMatcher replaces AntPathRequestMatcher, which 6.5 marked
+        // for removal. `mvc` targets the DispatcherServlet; `h2` targets the console
+        // servlet, which needs its own base path.
+        var mvc = withDefaults();
+        var h2 = withDefaults().basePath("/h2-console");
+
         http.authorizeHttpRequests(req -> {
-            req.requestMatchers(antMatcher("/cart/**"), antMatcher("/orders/**"), antMatcher("/user/**"))
+            req.requestMatchers(mvc.matcher("/cart/**"), mvc.matcher("/orders/**"), mvc.matcher("/user/**"))
                     .authenticated();
-            req.requestMatchers(antMatcher("/admin/**")).hasRole("ADMIN");
+            req.requestMatchers(mvc.matcher("/admin/**")).hasRole("ADMIN");
             req.anyRequest().permitAll();
         });
         http.formLogin(form -> {
@@ -54,7 +55,7 @@ public class SecurityConfig {
             h.frameOptions(frame -> frame.disable());
         });
         http.logout(l -> l.logoutUrl("/logout"));
-        http.csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/h2-console/**")));
+        http.csrf(csrf -> csrf.ignoringRequestMatchers(h2.matcher("/**")));
 
         return http.build();
     }
@@ -62,14 +63,15 @@ public class SecurityConfig {
     @Bean
     @Profile("prod")
     public SecurityFilterChain securityFilterChainProd(HttpSecurity http) throws Exception {
-        // antMatcher(...) here too. Prod registers no second servlet, so the String
-        // overload would start — but it would resolve to an MvcRequestMatcher and
-        // quietly change how these paths match. Keeping both chains explicit keeps
-        // them identical to each other and to the pre-upgrade behaviour.
+        // Explicit here too. Prod registers no second servlet, so bare Strings would
+        // start — but keeping both chains written the same way means they cannot
+        // drift apart, and a reader does not have to work out why they differ.
+        var mvc = withDefaults();
+
         http.authorizeHttpRequests(req -> {
-            req.requestMatchers(antMatcher("/cart/**"), antMatcher("/orders/**"), antMatcher("/user/**"))
+            req.requestMatchers(mvc.matcher("/cart/**"), mvc.matcher("/orders/**"), mvc.matcher("/user/**"))
                     .authenticated();
-            req.requestMatchers(antMatcher("/admin/**")).hasRole("ADMIN");
+            req.requestMatchers(mvc.matcher("/admin/**")).hasRole("ADMIN");
             req.anyRequest().permitAll();
         });
         http.formLogin(form -> {

@@ -37,7 +37,9 @@ dependencies {
 
     //region Spring other
     implementation 'org.springframework.session:spring-session-jdbc'
-    implementation 'org.springframework.security:spring-security-test'
+    // Test-only: was declared 'implementation', which shipped test scaffolding
+    // into the production jar.
+    testImplementation 'org.springframework.security:spring-security-test'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     //endregion
 

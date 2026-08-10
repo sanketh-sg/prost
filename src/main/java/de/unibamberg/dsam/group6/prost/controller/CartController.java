@@ -81,6 +81,9 @@ public class CartController {
         } catch (OrderService.OrderRejectedException e) {
             e.getMessages().forEach(message -> this.errors.addToast(Toast.error(message)));
             return "redirect:/cart";
+        } catch (OrderService.InsufficientStockException e) {
+            this.errors.addToast(Toast.error(e.getMessage()));
+            return "redirect:/cart";
         }
 
         this.cart.clear();

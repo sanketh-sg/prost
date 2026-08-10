@@ -349,6 +349,43 @@ modern `SecurityFilterChain` bean style, so there is nothing to migrate.
 `anyRequest().permitAll()` catch-all means behaviour is unchanged here — but delete that
 line and the application locks itself shut.
 
+#### The `requestMatchers(String)` trap — found only at runtime
+
+**This stopped the application from starting, and no test caught it.**
+
+```
+IllegalArgumentException: This method cannot decide whether these patterns are Spring
+MVC patterns or not... there is more than one mappable servlet in your servlet context:
+{DispatcherServlet=[/], JakartaWebServlet=[/h2-console/*]}
+```
+
+Security 6's `requestMatchers(String)` picks between `MvcRequestMatcher` and
+`AntPathRequestMatcher` by inspecting the servlet context. With more than one mapped
+servlet it refuses to guess and throws. The `dev` profile registers the H2 console servlet,
+so the `dev` chain failed at startup.
+
+**Why the suite could not catch it.** `@AutoConfigureMockMvc` never registers the H2 console
+servlet, so tests see a single servlet and no ambiguity. All 51 tests passed against an
+application that could not actually boot. This is the concrete argument for Layer 4 in
+Part 4: a green suite is not a running application.
+
+**The fix, and a second reason for it:**
+
+```java
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
+req.requestMatchers(antMatcher("/cart/**"), antMatcher("/orders/**")).authenticated();
+req.requestMatchers(antMatcher("/admin/**")).hasRole("ADMIN");
+http.csrf(csrf -> csrf.ignoringRequestMatchers(antMatcher("/h2-console/**")));
+```
+
+Being explicit is not merely a workaround. The pre-upgrade code used `antMatchers()`, which
+is **always** an `AntPathRequestMatcher`. Where the `String` overload does resolve without
+error, it resolves to an `MvcRequestMatcher`, which matches differently — so accepting it
+would silently change authorization semantics. `antMatcher(...)` preserves exactly what was
+there before, which is why it is applied to **both** chains and not only the one that
+failed.
+
 ### 2.4 Spring Session 3 — a schema change underneath the cart
 
 `spring-session-jdbc` moves to 3.x, which alters the `SPRING_SESSION` and
@@ -360,6 +397,37 @@ session state**. A silent failure empties every user's cart while the rest of th
 application looks healthy.
 
 `SessionPersistenceTest` is the instrument for it — see §1.3.
+
+**Outcome, verified in Hop 2.** The schema change was a non-event:
+`springSessionCreatesItsSchema` passed on the first run against Boot 3.
+
+**What actually broke was the mitigation, not the risk.** Boot 3 **removes the
+`spring.session.store-type` property**, confirmed by comparing the configuration metadata
+in both jars:
+
+| | `spring.session.store-type` |
+| --- | --- |
+| `spring-boot-autoconfigure` 2.7.5 | present |
+| `spring-boot-autoconfigure` 3.0.13 | **removed** |
+
+That property is what `@IntegrationTest` used to disable Spring Session so MockMvc's
+servlet-session helpers would work. Spring ignores unknown properties **silently** rather
+than failing, so the upgrade quietly re-enabled Spring Session and six cart assertions
+broke for a reason unrelated to the code under test.
+
+The replacement excludes the auto-configuration instead:
+
+```java
+@TestPropertySource(properties =
+    "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.session.SessionAutoConfiguration")
+```
+
+Better than the property in one specific way: a wrong class name throws at startup, where a
+wrong property name does nothing at all.
+
+**The lesson worth carrying.** A test-scoped workaround is itself something the upgrade can
+break, and it will break *silently* when it is expressed as a configuration property. When
+a mitigation can be written to fail loudly, write it that way.
 
 ### 2.5 Spring MVC 6 — trailing slashes stop matching
 
@@ -404,8 +472,78 @@ Listed so time is not wasted looking for problems that do not exist:
 - Spring Data JPA derived query methods such as `findAllByUser_username`
 - `@ControllerAdvice`, `@ModelAttribute`, view resolution, the `redirect:` prefix
 - BCrypt, `UserDetailsService`, `DaoAuthenticationProvider`
-- Thymeleaf template syntax — the *extras libraries* change, the templates do not
 - Bean Validation annotations — same annotations, new package
+
+> **Correction.** An earlier version of this list claimed "Thymeleaf template syntax —
+> the extras libraries change, the templates do not." **That was wrong**, and it was the
+> largest gap in this analysis. Thymeleaf 3.1 removes expression objects the templates
+> here use in twenty places. See §2.9.
+
+### 2.9 Thymeleaf 3.1 removes the request and session expression objects
+
+**Added after the fact. This caused 18 of the 24 failures in Hop 2 and was not predicted
+anywhere in the original analysis.**
+
+Boot 3 brings Thymeleaf 3.1, which removes four expression utility objects outright:
+
+```
+IllegalArgumentException: The 'request','session','servletContext' and 'response'
+expression utility objects are no longer available by default for template
+expressions and their use is not recommended.
+```
+
+Removed: `#request`, `#session`, `#servletContext`, `#response`. Spring's
+`#httpServletRequest` and `#httpSession` go with them.
+
+**Still available**, so do not rewrite these unnecessarily: `param`, `session` as a map,
+`application`, and every `#strings` / `#lists` / `#temporals` utility.
+
+The rationale is deliberate: templates reaching directly into the servlet API is a layering
+violation. The framework is pushing you to pass what the view needs through the model.
+
+**Scale in this repository:** 20 usages across 9 templates.
+
+| Usage | Count |
+| --- | --- |
+| `#httpServletRequest.getRequestURI()` | 12 |
+| `#httpServletRequest.getQueryString()` | 5 |
+| `#request.getParameter(...)` | 3 |
+
+Because `include/navbar.html` is on every page, this broke **every** rendering test at
+once — which is misleading. The blast radius looks catastrophic; the actual fix is small.
+
+**The fix used here.** Expose what the templates need as model attributes rather than
+handing them the request:
+
+```java
+// ControllerAdviceSetup — applies to every @Controller
+@ModelAttribute("currentUri")
+public String currentUri(HttpServletRequest request) {
+    return request.getRequestURI();
+}
+
+@ModelAttribute("currentUrl")
+public String currentUrl(HttpServletRequest request) {
+    var query = request.getQueryString();
+    return query == null ? request.getRequestURI() : request.getRequestURI() + "?" + query;
+}
+```
+
+For the three `getParameter` calls, the controller had **already bound those very
+parameters** as method arguments — `@RequestParam(name = "p") Optional<String> page`. They
+only needed adding to the model. The template was reaching around a value it was already
+being handed.
+
+**A bug fixed incidentally.** Two templates built their return URL as
+`uri + '?' + queryString` unconditionally, rendering a literal `?null` whenever there was
+no query string. Consolidating on `currentUrl` removed it. Worth noting rather than hiding:
+the removed API forced a rewrite, and there was no way to reproduce that behaviour without
+deliberately reimplementing the bug.
+
+**`nl2br` was fine.** `thymeleaf-extras-nl2br:1.0.2` was flagged in §1.5 as the highest
+risk — a third-party dialect last released for Thymeleaf 3.0. It works unchanged on 3.1.
+The fallback plan in §1.6 was not needed. The genuine risk was in Thymeleaf itself, not the
+third-party add-on, which is the opposite of what the dependency audit suggested.
 
 ---
 
@@ -600,6 +738,10 @@ SQL, not the entities.**
 | Primary-key collision on the first insert after upgrade | Hibernate 6 per-entity sequences starting at 1 against existing rows. See §2.2 |
 | `sequence "orders_seq" does not exist` | Same cause — Hibernate 6 wants per-entity sequences, the schema has `hibernate_sequence` |
 | A URL with a trailing slash now 404s | Spring MVC 6 dropped trailing-slash matching. See §2.5 |
+| Every rendering test fails with `TemplateInputException` | Thymeleaf 3.1 removed `#request` / `#httpServletRequest`. See §2.9 |
+| Cart or login assertions fail but the app works by hand | `spring.session.store-type` was removed and ignored silently. See §2.4 |
+| App will not start: "cannot decide whether these patterns are Spring MVC patterns" | Security 6 with a second servlet mapped. Use `antMatcher(...)`. See §2.3 |
+| Tests all green but the application does not boot | Almost always a servlet-context difference MockMvc does not reproduce. Run it |
 | Page renders unstyled | The frontend bundle is missing. Run `npx pnpm build` |
 | Template throws only at runtime | Thymeleaf dialect — `sec:` or `nl2br` |
 | `spotlessJavaCheck` fails on every file | CRLF working tree. `.gitattributes` plus `./gradlew spotlessApply` |

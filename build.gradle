@@ -59,6 +59,11 @@ dependencies {
     //endregion
 
     implementation 'org.hibernate.validator:hibernate-validator'
+
+    // Flyway replaces ddl-auto on prod. Boot 3.0 manages Flyway 9.5.1, which still
+    // bundles Postgres support; the separate flyway-database-postgresql artifact is
+    // only needed from Flyway 10.
+    implementation 'org.flywaydb:flyway-core'
     implementation 'org.postgresql:postgresql'
     implementation 'org.apache.commons:commons-lang3'
     implementation 'com.fasterxml.jackson.core:jackson-core'

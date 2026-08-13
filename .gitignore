@@ -5,6 +5,9 @@ build/
 */.gradle
 /docs/*.html
 /docs/*.txt
+.classpath
+**/.classpath
+
 # Node
 node_modules/
 
@@ -17,8 +20,7 @@ src/main/resources/static/build/
 *.iml
 .project
 .settings
-.classpath
-**/.classpath
+.metadata
 
 # Local database
 *.db

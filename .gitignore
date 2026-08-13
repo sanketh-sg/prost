@@ -5,6 +5,7 @@ build/
 */.gradle
 /docs/*.html
 /docs/*.txt
+/docs/prost*
 .classpath
 **/.classpath
 

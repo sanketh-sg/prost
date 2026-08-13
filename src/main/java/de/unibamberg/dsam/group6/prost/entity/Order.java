@@ -1,8 +1,8 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import java.util.*;
-import javax.persistence.*;
-import javax.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;

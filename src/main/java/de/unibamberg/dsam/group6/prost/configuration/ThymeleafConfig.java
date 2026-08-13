@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 
 @Configuration
 public class ThymeleafConfig {
@@ -21,10 +20,5 @@ public class ThymeleafConfig {
     @Bean
     public Nl2brDialect dialect() {
         return new Nl2brDialect();
-    }
-
-    @Bean
-    public Java8TimeDialect timeDialect() {
-        return new Java8TimeDialect();
     }
 }

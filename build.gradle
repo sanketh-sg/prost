@@ -1,13 +1,21 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.5'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.5.0'
+    id 'io.spring.dependency-management' version '1.1.4'
     id 'com.diffplug.spotless' version '6.11.0'
 }
 
 group = 'de.unibamberg.dsam.group6'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+
+// sourceCompatibility on the project is a JavaPluginConvention, deprecated in
+// Gradle 8 and removed in 9. The toolchain block also makes Gradle provision a
+// matching JDK rather than relying on whatever JAVA_HOME happens to be.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 configurations {
     compileOnly {
@@ -37,17 +45,25 @@ dependencies {
 
     //region Spring other
     implementation 'org.springframework.session:spring-session-jdbc'
-    implementation 'org.springframework.security:spring-security-test'
+    // Test-only: was declared 'implementation', which shipped test scaffolding
+    // into the production jar.
+    testImplementation 'org.springframework.security:spring-security-test'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     //endregion
 
     //region thymeleaf
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'com.github.bufferings:thymeleaf-extras-nl2br:1.0.2'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+    // thymeleaf-extras-java8time removed: the Java8TimeDialect bean was registered
+    // but no template uses temporals.*, and the dialect is folded into Thymeleaf 3.1.
     //endregion
 
     implementation 'org.hibernate.validator:hibernate-validator'
+
+    // Flyway replaces ddl-auto on prod. Boot 3.0 manages Flyway 9.5.1, which still
+    // bundles Postgres support; the separate flyway-database-postgresql artifact is
+    // only needed from Flyway 10.
+    implementation 'org.flywaydb:flyway-core'
     implementation 'org.postgresql:postgresql'
     implementation 'org.apache.commons:commons-lang3'
     implementation 'com.fasterxml.jackson.core:jackson-core'
@@ -61,7 +77,8 @@ dependencies {
 }
 
 bootJar {
-    archiveName "prost.jar"
+    // Gradle 8 removed archiveName in favour of archiveFileName.
+    archiveFileName = "prost.jar"
 }
 
 tasks.named('test') {

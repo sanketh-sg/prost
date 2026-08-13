@@ -1,7 +1,7 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
+import jakarta.persistence.*;
 import java.util.List;
-import javax.persistence.*;
 import lombok.*;
 
 @Entity

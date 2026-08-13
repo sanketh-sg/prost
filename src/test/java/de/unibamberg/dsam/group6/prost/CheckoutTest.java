@@ -114,23 +114,41 @@ class CheckoutTest {
     }
 
     /**
-     * CHARACTERIZATION — records a known bug, not desired behavior.
-     *
-     * <p>addToCart validates count against stock per request, but submitCart never
-     * re-checks. Two requests that are individually valid can therefore build a
-     * cart exceeding stock, and Math.max(reduced, 0) silently clamps stock to zero
-     * instead of rejecting the order.
-     *
-     * <p>Task 22 fixes this and replaces this test.
+     * add-to-cart validates stock per request, so two individually valid requests
+     * can build a cart that exceeds it. Checkout must catch that.
      */
     @Test
-    void overselling_isCurrentlyPossible() throws Exception {
-        var scarce = TestData.saveBottle(this.bottles, "OversoldBottle", 2).getId();
+    void checkoutIsRejectedWhenTheCartExceedsStock() throws Exception {
+        var scarce = TestData.saveBottle(this.bottles, "ScarceCheckout", 2).getId();
         var before = this.orderCount();
 
-        // Each request is individually within stock; together they are not.
+        this.add(scarce, 2);
+        this.add(scarce, 2); // cart now holds 4, stock is 2
+
+        this.submit("/cart");
+
+        assertThat(this.orderCount()).isEqualTo(before);
+    }
+
+    @Test
+    void rejectedCheckoutLeavesStockUntouched() throws Exception {
+        var scarce = TestData.saveBottle(this.bottles, "UntouchedStock", 2).getId();
+
         this.add(scarce, 2);
         this.add(scarce, 2);
+
+        this.submit("/cart");
+
+        assertThat(this.stockOf(scarce)).isEqualTo(2);
+    }
+
+    /** The boundary: asking for exactly the remaining stock must still succeed. */
+    @Test
+    void checkoutSucceedsWhenStockIsExactlySufficient() throws Exception {
+        var scarce = TestData.saveBottle(this.bottles, "ExactStock", 4).getId();
+        var before = this.orderCount();
+
+        this.add(scarce, 4);
 
         this.submit("/order_success");
 

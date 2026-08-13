@@ -32,3 +32,4 @@ sendgrid.env
 **/db_passwd
 **/*service-account*.json
 maximal-radius-*.json
+/.metadata/

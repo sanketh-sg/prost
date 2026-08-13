@@ -11,8 +11,7 @@
         <div class="flex flex-row justify-end gap-5 pb-5">
             <a
                 class="btn-primary flex flex-col justify-center"
-                th:href="@{/admin/form(type='bottle', from=${#httpServletRequest.getRequestURI()} +
-                    ${#httpServletRequest.getQueryString() == null ? '' : '?' + #httpServletRequest.getQueryString()})}">
+                th:href="@{/admin/form(type='bottle', from=${currentUrl})}">
                 <span>
                     <i class="fa-solid fa-wine-bottle"></i>&ensp;
                     Add bottle

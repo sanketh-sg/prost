@@ -5,13 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.unibamberg.dsam.group6.prost.entity.Bottle;
 import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.service.Cart;
+import de.unibamberg.dsam.group6.prost.support.IntegrationTest;
 import de.unibamberg.dsam.group6.prost.util.CartDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@IntegrationTest
 public class CartDTOTest {
     static final double PRICE1 = 256d;
     static final double PRICE2 = 512d;

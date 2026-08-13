@@ -2,6 +2,11 @@ spring:
     h2:
         console:
             enabled: true
+    # Flyway is off here on purpose. Dev runs H2 in-memory with ddl-auto: create,
+    # so the schema is rebuilt from the entities on every start and the migrations
+    # have nothing to migrate. This also keeps the test suite fast.
+    flyway:
+        enabled: false
     datasource:
         username: prostadmin
         password: strongpassword

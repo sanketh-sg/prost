@@ -9,14 +9,14 @@ spring:
         tomcat:
             max-active: 5
             max-idle: 5
+    # Flyway owns the schema here. Hibernate only checks that the entities match
+    # what the migrations produced — it never alters anything.
+    flyway:
+        enabled: true
+        baseline-on-migrate: true
     jpa:
-        properties:
-            hibernate:
-                jdbc:
-                    lob:
-                        non_contextual_creation: true
         hibernate:
-            ddl-auto: update
+            ddl-auto: validate
     thymeleaf:
         cache: true
 server:

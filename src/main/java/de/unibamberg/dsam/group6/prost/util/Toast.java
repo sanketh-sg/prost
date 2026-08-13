@@ -1,7 +1,7 @@
 package de.unibamberg.dsam.group6.prost.util;
 
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

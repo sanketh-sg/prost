@@ -17,6 +17,8 @@ src/main/resources/static/build/
 *.iml
 .project
 .settings
+.classpath
+**/.classpath
 
 # Local database
 *.db
@@ -28,3 +30,4 @@ sendgrid.env
 **/db_passwd
 **/*service-account*.json
 maximal-radius-*.json
+/.metadata/

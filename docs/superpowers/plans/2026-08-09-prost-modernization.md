@@ -2057,7 +2057,15 @@ git commit -m "build: upgrade Spring Boot 3.0.13 to 3.5.0"
 
 ---
 
-### Task 19: Java 17 → 21
+### Task 19: Java 17 → 21 — NOT TAKEN
+
+> **Superseded. This task was deliberately abandoned; see commit `ce94f27` and
+> `docs/reference/upgrading-spring-boot.md`.** The machine had only JDK 17, and
+> Gradle 8.5 cannot provision a toolchain without a resolver plugin. Rather than
+> add one or install a JDK, the upgrade stops at Java 17 — an LTS supported into
+> 2029, and Boot 3.5's own floor. The goal was reaching a supported framework,
+> and that is met. The steps below are retained for the record only; do not
+> execute them without first revisiting that decision.
 
 **Files:**
 - Modify: `build.gradle`
@@ -2705,7 +2713,7 @@ no log, so a mistyped action name looked identical to success."
 - [ ] No credential appears in `git log --all -p` or in any tree
 - [ ] `grep -riE "gcloud|google\.cloud|sendgrid|javax\.mail" --include="*.java" --include="*.gradle" --include="*.yml" .` returns nothing outside `docs/`
 - [ ] `./gradlew --version` reports Gradle 8.5
-- [ ] Startup banner reports Spring Boot 3.5.x on Java 21
+- [ ] Startup banner reports Spring Boot 3.5.x on Java 17 (Java 21 not taken — see Task 19)
 - [ ] `./gradlew clean build` is green
 - [ ] `GET /admin` anonymous returns a redirect, not 200
 - [ ] Checkout with a cart exceeding stock is rejected and leaves stock untouched

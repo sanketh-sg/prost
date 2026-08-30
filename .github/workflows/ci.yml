@@ -14,6 +14,14 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      # The Gradle build shells out to pnpm to bundle the frontend, so Node has
+      # to be on PATH before any Gradle task runs. pnpm/action-setup reads the
+      # packageManager field in package.json, so the version is not duplicated here.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
       - uses: gradle/actions/setup-gradle@v4
       - name: Check formatting
         run: ./gradlew spotlessCheck

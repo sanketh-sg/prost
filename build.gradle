@@ -84,6 +84,37 @@ bootJar {
     archiveFileName = "prost.jar"
 }
 
+// The bundle in src/main/resources/static/build is gitignored, so without this a
+// fresh clone packages a jar with no CSS or JS. pnpm is invoked through cmd on
+// Windows because Exec cannot launch a .cmd shim directly.
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+def pnpm = { List<String> args -> (isWindows ? ['cmd', '/c', 'pnpm'] : ['pnpm']) + args }
+
+tasks.register('frontendInstall', Exec) {
+    description = 'Installs frontend dependencies with pnpm.'
+    group = 'build'
+    inputs.files('package.json', 'pnpm-lock.yaml')
+    // Snapshotting all of node_modules would be far slower than the install
+    // itself; this marker file is rewritten by every pnpm install.
+    outputs.file('node_modules/.modules.yaml')
+    commandLine pnpm(['install', '--frozen-lockfile'])
+}
+
+tasks.register('frontendBuild', Exec) {
+    description = 'Bundles the frontend into src/main/resources/static/build.'
+    group = 'build'
+    dependsOn 'frontendInstall'
+    inputs.files('package.json', 'webpack.config.js', 'tailwind.config.js', 'postcss.config.js')
+    inputs.dir('frontend')
+    // Tailwind scans the templates to decide which utilities to emit, so a
+    // template edit changes the generated CSS.
+    inputs.dir('src/main/resources/templates')
+    outputs.dir('src/main/resources/static/build')
+    commandLine pnpm(['run', 'build:prod'])
+}
+
+processResources.dependsOn 'frontendBuild'
+
 tasks.named('test') {
     useJUnitPlatform()
 }

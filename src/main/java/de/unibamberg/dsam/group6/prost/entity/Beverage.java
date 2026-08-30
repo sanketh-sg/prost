@@ -1,6 +1,7 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import lombok.*;
@@ -31,7 +32,7 @@ public abstract class Beverage {
 
     public abstract String getName();
 
-    public abstract double getPrice();
+    public abstract BigDecimal getPrice();
 
     public abstract String getPicture();
 

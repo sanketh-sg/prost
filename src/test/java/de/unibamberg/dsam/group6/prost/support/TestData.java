@@ -3,6 +3,7 @@ package de.unibamberg.dsam.group6.prost.support;
 import de.unibamberg.dsam.group6.prost.entity.Bottle;
 import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.service.admin.DatabaseLoader;
+import java.math.BigDecimal;
 
 /**
  * Seeding helpers for integration tests.
@@ -33,7 +34,7 @@ public final class TestData {
                 .bottlePic("https://example.invalid/bottle.png")
                 .volume(0.5)
                 .volumePercent(5.0)
-                .price(2.0)
+                .price(BigDecimal.valueOf(2.0))
                 .supplier("TestSupplier")
                 .inStock(inStock)
                 .build());

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.unibamberg.dsam.group6.prost.entity.*;
 import de.unibamberg.dsam.group6.prost.repository.*;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
@@ -91,7 +92,7 @@ public class DatabaseLoader {
                     .bottlePic((String) b.get("bottlePic"))
                     .volume((Double) b.get("volume"))
                     .volumePercent((Double) b.get("volumePercent"))
-                    .price((Integer) b.get("price"))
+                    .price(BigDecimal.valueOf(((Number) b.get("price")).doubleValue()))
                     .supplier((String) b.get("supplier"))
                     .inStock((Integer) b.get("inStock"))
                     .build());
@@ -114,7 +115,7 @@ public class DatabaseLoader {
                     .name((String) c.get("name"))
                     .cratePic((String) c.get("cratePic"))
                     .noOfBottles((int) c.get("noOfBottles"))
-                    .price((double) c.get("price"))
+                    .price(BigDecimal.valueOf(((Number) c.get("price")).doubleValue()))
                     .cratesInStock((int) c.get("cratesInStock"))
                     .bottle(bottles.get(iter))
                     .build());

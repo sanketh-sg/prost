@@ -1,9 +1,10 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import java.util.Objects;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -25,9 +26,9 @@ public class OrderItem {
     @Pattern(regexp = "\\d+")
     private String position;
 
-    @Column(name = "price")
-    @Min(1)
-    private double price;
+    @Column(name = "price", precision = 10, scale = 2)
+    @DecimalMin("0.01")
+    private BigDecimal price;
 
     @ManyToOne(targetEntity = Order.class)
     @JoinColumn(name = "order_id")

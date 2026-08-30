@@ -3,6 +3,7 @@ package de.unibamberg.dsam.group6.prost.util;
 import de.unibamberg.dsam.group6.prost.entity.Beverage;
 import de.unibamberg.dsam.group6.prost.entity.Order;
 import de.unibamberg.dsam.group6.prost.entity.OrderItem;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +25,10 @@ public class CartDTO {
         return self;
     }
 
-    private double totalPrice = -1;
+    private BigDecimal totalPrice = null;
 
-    public double getTotalPrice() {
-        if (this.totalPrice == -1) {
+    public BigDecimal getTotalPrice() {
+        if (this.totalPrice == null) {
             this.recalculatePrice();
         }
         return this.totalPrice;
@@ -37,8 +38,9 @@ public class CartDTO {
      * Calculate prices of all beverages in cart
      */
     public void recalculatePrice() {
-        this.totalPrice = this.beverages.keySet().stream()
-                .reduce(0.0, (prev, cur) -> prev + this.beverages.get(cur) * cur.getPrice(), Double::sum);
+        this.totalPrice = this.beverages.entrySet().stream()
+                .map(e -> e.getKey().getPrice().multiply(BigDecimal.valueOf(e.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     /**

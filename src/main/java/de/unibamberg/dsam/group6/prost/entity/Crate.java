@@ -1,10 +1,12 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
@@ -32,9 +34,9 @@ public class Crate extends Beverage {
     @Min(1)
     private int noOfBottles;
 
-    @Column(name = "price")
-    @Min(1)
-    private double price;
+    @Column(name = "price", precision = 10, scale = 2)
+    @DecimalMin("0.01")
+    private BigDecimal price;
 
     @Column(name = "crates_in_stock")
     @Min(0)

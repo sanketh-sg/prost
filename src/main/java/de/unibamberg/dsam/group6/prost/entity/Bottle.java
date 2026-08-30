@@ -3,9 +3,11 @@ package de.unibamberg.dsam.group6.prost.entity;
 import static java.lang.String.format;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
@@ -34,9 +36,9 @@ public class Bottle extends Beverage {
     @Min(0)
     private double volumePercent;
 
-    @Column(name = "price")
-    @Min(1)
-    private double price;
+    @Column(name = "price", precision = 10, scale = 2)
+    @DecimalMin("0.01")
+    private BigDecimal price;
 
     @Column(name = "supplier")
     @NotEmpty
@@ -62,7 +64,7 @@ public class Bottle extends Beverage {
     }
 
     @Override
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return this.price;
     }
 

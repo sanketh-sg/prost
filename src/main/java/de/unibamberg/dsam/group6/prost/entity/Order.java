@@ -1,7 +1,8 @@
 package de.unibamberg.dsam.group6.prost.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMin;
+import java.math.BigDecimal;
 import java.util.*;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -30,9 +31,9 @@ public class Order {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "price")
-    @Min(1)
-    private double price;
+    @Column(name = "price", precision = 10, scale = 2)
+    @DecimalMin("0.01")
+    private BigDecimal price;
 
     @Column(name = "created_on", updatable = false, nullable = false)
     @CreationTimestamp

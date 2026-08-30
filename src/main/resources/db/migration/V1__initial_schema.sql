@@ -56,7 +56,7 @@ create table beverage (
     bottle_pic      varchar(255),
     in_stock        integer          check (in_stock >= 0),
     name            varchar(255),
-    price           double precision check (price >= 1),
+    price           numeric(10, 2) check (price >= 0.01),
     supplier        varchar(255),
     volume          double precision check (volume >= 0),
     volume_percent  double precision check (volume_percent >= 0),
@@ -70,7 +70,7 @@ create table beverage (
 create table orders (
     id         bigint       not null,
     created_on timestamp(6) not null,
-    price      double precision check (price >= 1),
+    price      numeric(10, 2) check (price >= 0.01),
     user_id    varchar(255),
     primary key (id)
 );
@@ -79,7 +79,7 @@ create table orders (
 create table order_items (
     id          bigint not null,
     position    varchar(255),
-    price       double precision check (price >= 1),
+    price       numeric(10, 2) check (price >= 0.01),
     beverage_id bigint not null,
     order_id    bigint,
     primary key (id)

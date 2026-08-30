@@ -7,14 +7,15 @@ import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.service.Cart;
 import de.unibamberg.dsam.group6.prost.support.IntegrationTest;
 import de.unibamberg.dsam.group6.prost.util.CartDTO;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
 public class CartDTOTest {
-    static final double PRICE1 = 256d;
-    static final double PRICE2 = 512d;
+    static final BigDecimal PRICE1 = BigDecimal.valueOf(256d);
+    static final BigDecimal PRICE2 = BigDecimal.valueOf(512d);
 
     @Autowired
     Cart cart;
@@ -55,12 +56,12 @@ public class CartDTOTest {
 
     @Test
     void totalPrice() {
-        assertThat(this.getDTO().getTotalPrice()).isEqualTo(PRICE1 + PRICE2);
+        assertThat(this.getDTO().getTotalPrice()).isEqualByComparingTo(PRICE1.add(PRICE2));
     }
 
     @Test
     void multipleItems() {
-        final var price = 1234d;
+        final var price = BigDecimal.valueOf(1234d);
         final var count = 9;
 
         final var b = this.bottlesRepository.save(Bottle.builder()
@@ -72,12 +73,13 @@ public class CartDTOTest {
                 .volumePercent(7.3)
                 .build());
         this.cart.addToCart(b.getId(), count);
-        assertThat(this.getDTO().getTotalPrice()).isEqualTo(PRICE1 + PRICE2 + count * price);
+        assertThat(this.getDTO().getTotalPrice())
+                .isEqualByComparingTo(PRICE1.add(PRICE2).add(price.multiply(BigDecimal.valueOf(count))));
     }
 
     @Test
     void translateToCartItems() {
-        final var price = 1234d;
+        final var price = BigDecimal.valueOf(1234d);
         final var count = 9;
 
         final var b = this.bottlesRepository.save(Bottle.builder()
@@ -90,7 +92,8 @@ public class CartDTOTest {
                 .build());
         this.cart.addToCart(b.getId(), count);
         assertThat(this.getDTO().getOrderItems().stream()
-                        .reduce(0.0, (state, oi) -> state + oi.getPrice(), Double::sum))
-                .isEqualTo(this.cart.getCartState().getTotalPrice());
+                        .map(oi -> oi.getPrice())
+                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                .isEqualByComparingTo(this.cart.getCartState().getTotalPrice());
     }
 }

@@ -105,6 +105,19 @@ selling twelve of the ten remaining crates left the stock reading zero rather th
 minus two — the evidence of the problem was destroyed by the same line that caused
 it.
 
+**A worked example.** Say the shelf holds 10 crates.
+
+| Step | What happens | Stock reads |
+|---|---|---|
+| Customer A adds 6 to their basket | Checked against 10 in stock — fine | still 10 (not yet sold) |
+| Customer B adds 6 to their basket, in a different tab | Checked against 10 in stock — also fine, checkout hasn't happened yet | still 10 |
+| Both check out | 6 + 6 = 12 sold against a shelf of 10 | `max(10 - 12, 0)` → **0** |
+
+Twelve crates were sold. Ten existed. The two customers are owed two crates that
+don't exist — and the stock column reads exactly `0`, identical to what it would
+read if the shelf had simply, legitimately, sold out. There is no `-2` anywhere
+to search for, because the clamp erased it at the moment it was written.
+
 **Why it matters:** you take money for goods you cannot ship, and nothing in the
 data shows that it happened.
 
@@ -137,6 +150,27 @@ Products were used as keys in a fast-lookup structure, which works by grouping
 items into buckets by a numeric fingerprint. Every product returned the *same*
 fingerprint, so they all landed in one bucket and every lookup had to check them
 one by one.
+
+**A worked example.** A fast-lookup structure (a hash map) is like a wall of
+labelled pigeonholes: each item's fingerprint says which pigeonhole to check,
+so a lookup only has to search inside that one hole instead of the whole wall.
+
+The bug was that every product's fingerprint came from `getClass().hashCode()`
+— a number based on *the class* `Bottle` or `Crate`, not on *which* bottle or
+crate. So "Pilsner" and "Wheat Beer" produced the exact same fingerprint,
+because they're both instances of the same class:
+
+```
+Pilsner.hashCode()    → 1847293 (the Bottle class's fingerprint)
+Wheat Beer.hashCode() → 1847293 (the same fingerprint — wrong)
+```
+
+Every bottle piled into the one pigeonhole belonging to fingerprint 1847293,
+and every crate into the one belonging to its own class. A lookup for
+"Wheat Beer" would land in that pigeonhole, then have to check every bottle
+inside it one by one to find the right one — which happened to still return
+the correct answer, purely because nothing in the app ever put the *same*
+bottle into the basket twice in a way that exposed the mistake.
 
 **Why it matters:** it was correct only by luck — each page happens to load each
 product exactly once. Load the same product twice and the basket would have

@@ -33,8 +33,9 @@ repositories {
 
 dependencies {
     //region Spring Boot
+    // starter-jdbc removed: starter-data-jpa already brings spring-jdbc and
+    // HikariCP, which is all spring-session-jdbc needs.
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -53,7 +54,9 @@ dependencies {
 
     //region thymeleaf
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    implementation 'com.github.bufferings:thymeleaf-extras-nl2br:1.0.2'
+    // thymeleaf-extras-nl2br removed: the three templates that used it now use
+    // th:text with Tailwind's whitespace-pre-line, which renders newlines in CSS
+    // instead of generating <br> tags.
     // thymeleaf-extras-java8time removed: the Java8TimeDialect bean was registered
     // but no template uses temporals.*, and the dialect is folded into Thymeleaf 3.1.
     //endregion
@@ -65,8 +68,8 @@ dependencies {
     // only needed from Flyway 10.
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.postgresql:postgresql'
-    implementation 'org.apache.commons:commons-lang3'
-    implementation 'com.fasterxml.jackson.core:jackson-core'
+    // commons-lang3 removed: nothing imported it. jackson-core removed: the only
+    // Jackson usage is ObjectMapper from jackson-databind, which starter-web brings.
     developmentOnly 'com.h2database:h2'
     // developmentOnly only feeds runtimeClasspath, not testRuntimeClasspath, so
     // tests on the dev profile cannot load org.h2.Driver without this.

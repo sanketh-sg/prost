@@ -8,6 +8,7 @@ build/
 /docs/prost*
 .classpath
 **/.classpath
+/docs/superpowers
 
 # Node
 node_modules/

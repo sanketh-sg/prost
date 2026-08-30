@@ -59,7 +59,7 @@
             <div style="max-width: 280px;" class="admin-widget" th:if="${param.getOrDefault('p', null) == null}">
                 <h2 class="widget-title">Version</h2>
                 <hr class="mb-3">
-                <p class="break-words text-center" nl2br:text="${version}"></p>
+                <p class="break-words whitespace-pre-line text-center" th:text="${version}"></p>
             </div>
 
             <div th:if="${!@environment.acceptsProfiles('prod') && #strings.equals(selectedPanel, 'h2-console')}" class="admin-widget text-center">

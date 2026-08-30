@@ -1,6 +1,8 @@
 package de.unibamberg.dsam.group6.prost;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,9 +47,9 @@ class AuthorizationTest {
     @Test
     @WithMockUser(username = "someone", roles = "USER")
     void adminActionIsForbiddenForAuthenticatedNonAdmins() throws Exception {
-        this.mvc
-                .perform(get("/admin/action").param("a", "databaseLoader::clearDatabase"))
-                .andExpect(status().isForbidden());
+        // csrf() is supplied so a 403 can only mean the authorization rule fired,
+        // not a missing token.
+        this.mvc.perform(post("/admin/clear").with(csrf())).andExpect(status().isForbidden());
     }
 
     @Test

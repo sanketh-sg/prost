@@ -15,16 +15,11 @@ import de.unibamberg.dsam.group6.prost.service.admin.DatabaseLoader;
 public final class TestData {
     private TestData() {}
 
-    /**
-     * Seeds bottles and crates from data.json, blocking until complete.
-     *
-     * <p>DatabaseLoader's actions are {@code @Async} and return {@code Future},
-     * so assertions race the seeding unless the futures are awaited here.
-     */
+    /** Seeds bottles and crates from data.json. */
     public static void seedCatalogue(DatabaseLoader loader) {
         try {
-            loader.action__importBottles().get();
-            loader.action__importCrates().get();
+            loader.importBottles();
+            loader.importCrates();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to seed test catalogue", e);
         }

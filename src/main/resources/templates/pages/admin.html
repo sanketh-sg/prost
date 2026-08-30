@@ -30,17 +30,31 @@
             <div class="admin-widget" th:if="${param.getOrDefault('p', null) == null}">
                 <h2 class="widget-title">Actions</h2>
                 <hr class="mb-3">
-                <div class="flex flex-col" th:each="actionInstance : ${actions}" th:with="instance=${actionInstance.getInstanceName()}">
-                    <h3 class="font-bold mb-3 underline" th:text="${instance}"></h3>
-                    <div th:each="method : ${actionInstance.getMethodNames()}" class="flex flex-row justify-between">
-                        <h4 style="margin-right: 1em;" th:text="${method}"></h4>
-                        <div class="mb-3">
-                            <a class="btn-success" th:href="'/admin/action?a=' + ${instance} + '::' + ${method}">Call</a>
-                            <a class="btn-success" th:href="'/admin/action?a=' + ${instance} + '::' + ${method} + '&await=1'">Await</a>
-                        </div>
-                    </div>
-                    <hr class="my-3">
-                </div>
+                <form th:action="@{/admin/import/all}" method="post" class="flex flex-row justify-between mb-3">
+                    <h4 style="margin-right: 1em;">Import everything</h4>
+                    <input type="hidden" name="next" value="/admin"/>
+                    <button type="submit" class="btn-success">Run</button>
+                </form>
+                <form th:action="@{/admin/import/users}" method="post" class="flex flex-row justify-between mb-3">
+                    <h4 style="margin-right: 1em;">Import users</h4>
+                    <input type="hidden" name="next" value="/admin"/>
+                    <button type="submit" class="btn-success">Run</button>
+                </form>
+                <form th:action="@{/admin/import/bottles}" method="post" class="flex flex-row justify-between mb-3">
+                    <h4 style="margin-right: 1em;">Import bottles</h4>
+                    <input type="hidden" name="next" value="/admin"/>
+                    <button type="submit" class="btn-success">Run</button>
+                </form>
+                <form th:action="@{/admin/import/crates}" method="post" class="flex flex-row justify-between mb-3">
+                    <h4 style="margin-right: 1em;">Import crates</h4>
+                    <input type="hidden" name="next" value="/admin"/>
+                    <button type="submit" class="btn-success">Run</button>
+                </form>
+                <form th:action="@{/admin/clear}" method="post" class="flex flex-row justify-between mb-3">
+                    <h4 style="margin-right: 1em;">Clear database</h4>
+                    <input type="hidden" name="next" value="/admin"/>
+                    <button type="submit" class="btn-danger">Run</button>
+                </form>
             </div>
 
             <div class="admin-widget" th:if="${param.getOrDefault('p', null) == null}">

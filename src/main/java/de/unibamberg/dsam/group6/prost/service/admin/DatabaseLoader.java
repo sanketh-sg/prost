@@ -3,23 +3,17 @@ package de.unibamberg.dsam.group6.prost.service.admin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.unibamberg.dsam.group6.prost.entity.*;
 import de.unibamberg.dsam.group6.prost.repository.*;
-import de.unibamberg.dsam.group6.prost.util.annotation.AdminAction;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@AdminAction
 public class DatabaseLoader {
     private final UserRepository userRepository;
     private final BottlesRepository bottlesRepository;
@@ -41,17 +35,8 @@ public class DatabaseLoader {
         return this.data;
     }
 
-    @Async
-    public Future<String> action__importAll() throws ExecutionException, InterruptedException, IOException {
-        final var sb = new StringBuilder()
-                .append(this.action__importUsers().get())
-                .append(System.lineSeparator())
-                .append(this.action__importBottles().get())
-                .append(System.lineSeparator())
-                .append(this.action__importCrates().get())
-                .append(System.lineSeparator());
-
-        return CompletableFuture.completedFuture(sb.toString());
+    public String importAll() throws IOException {
+        return String.join(System.lineSeparator(), this.importUsers(), this.importBottles(), this.importCrates());
     }
 
     private Role createRoleIfNotFound(String name, Set<Privilege> privileges) {
@@ -77,8 +62,7 @@ public class DatabaseLoader {
         return privilege.get();
     }
 
-    @Async
-    public Future<String> action__importUsers() throws IOException {
+    public String importUsers() throws IOException {
         final var users = (List<Map<String, String>>) this.getData().get("users");
         users.forEach(u -> {
             var b = u.get("birthday").split("-");
@@ -96,11 +80,10 @@ public class DatabaseLoader {
                     .build());
         });
         this.userRepository.flush();
-        return CompletableFuture.completedFuture("Users imported successfully.");
+        return "Users imported successfully.";
     }
 
-    @Async
-    public Future<String> action__importBottles() throws IOException {
+    public String importBottles() throws IOException {
         final var bottles = (List<Map<String, Object>>) this.getData().get("bottles");
         bottles.forEach(b -> {
             this.bottlesRepository.save(Bottle.builder()
@@ -114,11 +97,10 @@ public class DatabaseLoader {
                     .build());
         });
         this.bottlesRepository.flush();
-        return CompletableFuture.completedFuture("Bottles imported successfully.");
+        return "Bottles imported successfully.";
     }
 
-    @Async
-    public Future<String> action__importCrates() throws IOException {
+    public String importCrates() throws IOException {
         final var crates = (List<Map<String, Object>>) this.getData().get("crates");
         final var bottles = this.bottlesRepository.findAllBeerLike();
         var iter = 0;
@@ -139,15 +121,14 @@ public class DatabaseLoader {
             iter++;
         }
         this.cratesRepository.flush();
-        return CompletableFuture.completedFuture("Crates imported successfully");
+        return "Crates imported successfully";
     }
 
-    @Async
-    public Future<String> action__clearDatabase() {
+    public String clearDatabase() {
         this.cratesRepository.deleteAll();
         this.userRepository.deleteAll();
         this.bottlesRepository.deleteAll();
 
-        return CompletableFuture.completedFuture("Cleared successfully.");
+        return "Cleared successfully.";
     }
 }

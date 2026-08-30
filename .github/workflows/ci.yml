@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     branches: ['**']
+    paths-ignore: ['**.md']
   pull_request:
+    paths-ignore: ['**.md']
 
 jobs:
   test:
@@ -23,10 +25,8 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
       - uses: gradle/actions/setup-gradle@v4
-      - name: Check formatting
-        run: ./gradlew spotlessCheck
-      - name: Run tests
-        run: ./gradlew test
+      - name: Check formatting and run tests
+        run: ./gradlew spotlessCheck test
       - name: Publish test report
         if: always()
         uses: actions/upload-artifact@v4

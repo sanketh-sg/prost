@@ -39,15 +39,12 @@ public class Order {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdOn;
 
-    // region Relations
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "order")
     private List<OrderItem> orderItems;
-    // endregion
 
     @Override
     public boolean equals(Object o) {

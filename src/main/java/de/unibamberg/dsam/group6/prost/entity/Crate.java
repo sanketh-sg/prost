@@ -42,14 +42,10 @@ public class Crate extends Beverage {
     @Min(0)
     private int cratesInStock;
 
-    // region Relations
-
     @ManyToOne
     @JoinColumn(name = "bottle_id")
     @NotNull(message = "Must choose a bottle.")
     private Bottle bottle;
-
-    // endregion
 
     @Override
     public boolean equals(Object o) {

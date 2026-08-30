@@ -29,7 +29,6 @@ public class OrderItem {
     @Min(1)
     private double price;
 
-    // region Relations
     @ManyToOne(targetEntity = Order.class)
     @JoinColumn(name = "order_id")
     private Order order;
@@ -38,8 +37,6 @@ public class OrderItem {
     @JoinColumn(name = "beverage_id")
     @NotNull
     private Beverage beverage;
-
-    // endregion
 
     @Override
     public boolean equals(Object o) {

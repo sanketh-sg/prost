@@ -9,6 +9,7 @@ import de.unibamberg.dsam.group6.prost.repository.UserRepository;
 import de.unibamberg.dsam.group6.prost.service.AdminActionsProvider;
 import de.unibamberg.dsam.group6.prost.service.UserErrorManager;
 import de.unibamberg.dsam.group6.prost.service.admin.VersionReader;
+import de.unibamberg.dsam.group6.prost.util.Redirects;
 import de.unibamberg.dsam.group6.prost.util.Toast;
 import de.unibamberg.dsam.group6.prost.util.exception.CallFailedException;
 import jakarta.validation.Valid;
@@ -69,14 +70,14 @@ public class AdminController {
         if (action.isEmpty()) {
             log.warn("Admin action requested with no 'a' parameter");
             this.errors.addToast(Toast.error("No action specified."));
-            return "redirect:" + next.orElse("/admin");
+            return "redirect:" + Redirects.safe(next, "/admin");
         }
 
         var a = action.get().split("::");
         if (a.length != 2) {
             log.warn("Malformed admin action '{}'", action.get());
             this.errors.addToast(Toast.error("Malformed action '%s'. Expected 'instance::method'.", action.get()));
-            return "redirect:" + next.orElse("/admin");
+            return "redirect:" + Redirects.safe(next, "/admin");
         }
 
         var instance = this.actions.getAnnotatedInstances().stream()
@@ -85,7 +86,7 @@ public class AdminController {
         if (instance.size() != 1) {
             log.warn("Unknown admin action instance '{}'", a[0]);
             this.errors.addToast(Toast.error("Unknown action instance '%s'.", a[0]));
-            return "redirect:" + next.orElse("/admin");
+            return "redirect:" + Redirects.safe(next, "/admin");
         }
 
         try {
@@ -98,7 +99,7 @@ public class AdminController {
         } catch (CallFailedException | InterruptedException | ExecutionException e) {
             this.errors.addToast(Toast.error("Action failed: %s", e));
         }
-        return "redirect:" + next.orElse("/admin");
+        return "redirect:" + Redirects.safe(next, "/admin");
     }
 
     @GetMapping("/form")
@@ -128,7 +129,7 @@ public class AdminController {
             var added = this.bottlesRepository.save(bottle);
             this.errors.addToast(Toast.success("%s added successfully.", added.getName()));
         }
-        return "redirect:" + next.orElse("/admin");
+        return "redirect:" + Redirects.safe(next, "/admin");
     }
 
     @PostMapping("/addCrate")
@@ -142,6 +143,6 @@ public class AdminController {
             var added = this.cratesRepository.save(crate);
             this.errors.addToast(Toast.success("%s added successfully.", added.getName()));
         }
-        return "redirect:" + next.orElse("/admin");
+        return "redirect:" + Redirects.safe(next, "/admin");
     }
 }

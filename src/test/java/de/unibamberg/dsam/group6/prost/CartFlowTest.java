@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.unibamberg.dsam.group6.prost.entity.Beverage;
@@ -112,6 +113,35 @@ class CartFlowTest {
         this.add(this.bottleId + 100_000L, 1);
 
         assertThat(this.cartContents()).isEmpty();
+    }
+
+    /**
+     * The Redirects guard must not break the feature it protects: "add to cart" is expected to
+     * return the user to the page they came from. Without this, a guard that rejected every
+     * target would still leave the whole suite green.
+     */
+    @Test
+    void aSameSiteNextIsHonoured() throws Exception {
+        this.mvc
+                .perform(post("/cart/add")
+                        .session(this.session)
+                        .with(csrf())
+                        .param("beverageId", this.bottleId.toString())
+                        .param("next", "/bottles?page=2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/bottles?page=2"));
+    }
+
+    @Test
+    void anOffSiteNextIsReplacedByTheFallback() throws Exception {
+        this.mvc
+                .perform(post("/cart/add")
+                        .session(this.session)
+                        .with(csrf())
+                        .param("beverageId", this.bottleId.toString())
+                        .param("next", "https://evil.example"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
     }
 
     /**

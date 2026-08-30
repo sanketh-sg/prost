@@ -64,8 +64,12 @@ public class SecurityConfig {
     @Profile("prod")
     public SecurityFilterChain securityFilterChainProd(HttpSecurity http) throws Exception {
         // Explicit here too. Prod registers no second servlet, so bare Strings would
-        // start — but keeping both chains written the same way means they cannot
-        // drift apart, and a reader does not have to work out why they differ.
+        // start; writing both chains the same way keeps the real differences visible.
+        //
+        // The authorization matrix below is duplicated from the dev chain, which is a
+        // convention rather than a mechanism — it has drifted once already. Only the
+        // dev chain is exercised by tests, so a prod-only change here is invisible to
+        // the suite.
         var mvc = withDefaults();
 
         http.authorizeHttpRequests(req -> {

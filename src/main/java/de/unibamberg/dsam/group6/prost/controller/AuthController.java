@@ -58,13 +58,11 @@ public class AuthController {
             @RequestParam String password,
             @RequestParam String passwordCheck,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthday) {
-        // Check if passwords match
         if (!password.equals(passwordCheck)) {
             this.errors.addToast(Toast.error("Passwords didn't match!"));
             return "redirect:/register";
         }
 
-        // check for unique username
         if (this.userRepo.findUserByUsername(username).isPresent()) {
             this.errors.addToast(Toast.error("This username is already in use. :/"));
             return "redirect:/register";
@@ -75,21 +73,18 @@ public class AuthController {
             return "redirect:/register";
         }
 
-        // Create user object
         var user = User.builder()
                 .username(username)
                 .password(this.passwordEncoder.encode(password))
                 .birthday(birthday)
                 .build();
 
-        // Native Bean Validation constraint checking
         var res = this.validator.validate(user);
         if (!res.isEmpty()) {
             res.forEach(err -> this.errors.addToast(Toast.error(err.getMessage())));
             return "redirect:/register";
         }
 
-        // persist user and try to log in
         this.userRepo.saveAndFlush(user);
         try {
             req.login(username, password);

@@ -44,8 +44,6 @@ public class Cart {
         initialCart.put(beverageId, count - 1);
         count = initialCart.get(beverageId);
 
-        // if there are no more beverages of certain id left in cart
-        // remove the beverage completely
         if (count <= 0) {
             initialCart.remove(beverageId);
         }
@@ -88,10 +86,6 @@ public class Cart {
         return itemsForDisplay;
     }
 
-    /**
-     * Set session cart attribute
-     * @param cart map of cart items to put into session
-     */
     public void setCartItems(@NotNull Map<Long, Integer> cart) {
         this.session.setAttribute(CART_SESSION_KEY, cart);
     }

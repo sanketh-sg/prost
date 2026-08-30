@@ -43,8 +43,6 @@ public class User implements UserDetails {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
-    // region Relations
-
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
@@ -55,8 +53,6 @@ public class User implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "delivery_address_id")
     private Address deliveryAddress;
-
-    // endregion
 
     @Override
     public boolean equals(Object o) {

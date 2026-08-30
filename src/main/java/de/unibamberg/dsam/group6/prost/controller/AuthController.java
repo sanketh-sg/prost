@@ -3,18 +3,19 @@ package de.unibamberg.dsam.group6.prost.controller;
 import de.unibamberg.dsam.group6.prost.entity.User;
 import de.unibamberg.dsam.group6.prost.repository.UserRepository;
 import de.unibamberg.dsam.group6.prost.service.UserErrorManager;
+import de.unibamberg.dsam.group6.prost.util.RegistrationForm;
 import de.unibamberg.dsam.group6.prost.util.Toast;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Validator;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -23,7 +24,6 @@ public class AuthController {
     private final UserErrorManager errors;
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final Validator validator;
 
     @GetMapping("/whoami")
     @ResponseBody
@@ -44,50 +44,41 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String registerPage(Principal principal) {
+    public String registerPage(Principal principal, Model model) {
         if (principal != null) {
             return "redirect:/";
         }
+        model.addAttribute("form", new RegistrationForm());
         return "pages/register";
     }
 
     @PostMapping("/register")
     public String register(
-            HttpServletRequest req,
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String passwordCheck,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthday) {
-        if (!password.equals(passwordCheck)) {
-            this.errors.addToast(Toast.error("Passwords didn't match!"));
-            return "redirect:/register";
+            HttpServletRequest req, @ModelAttribute("form") @Valid RegistrationForm form, Errors errors) {
+        // Validation runs on the submitted form, before the password is encoded. Validating the
+        // built entity instead meant @NotEmpty inspected a bcrypt string, which is never empty.
+        if (this.userRepo.findUserByUsername(form.getUsername()).isPresent()) {
+            errors.rejectValue("username", "duplicate", "This username is already in use. :/");
         }
 
-        if (this.userRepo.findUserByUsername(username).isPresent()) {
-            this.errors.addToast(Toast.error("This username is already in use. :/"));
-            return "redirect:/register";
+        if (form.getBirthday() != null
+                && form.getBirthday().isAfter(LocalDate.now().minusYears(16))) {
+            errors.rejectValue("birthday", "tooYoung", "You are too young to join :)");
         }
 
-        if (birthday.isAfter(LocalDate.now().minusYears(16))) {
-            this.errors.addToast(Toast.error("You are too young to join :)"));
-            return "redirect:/register";
+        if (errors.hasErrors()) {
+            return "pages/register";
         }
 
         var user = User.builder()
-                .username(username)
-                .password(this.passwordEncoder.encode(password))
-                .birthday(birthday)
+                .username(form.getUsername())
+                .password(this.passwordEncoder.encode(form.getPassword()))
+                .birthday(form.getBirthday())
                 .build();
-
-        var res = this.validator.validate(user);
-        if (!res.isEmpty()) {
-            res.forEach(err -> this.errors.addToast(Toast.error(err.getMessage())));
-            return "redirect:/register";
-        }
 
         this.userRepo.saveAndFlush(user);
         try {
-            req.login(username, password);
+            req.login(form.getUsername(), form.getPassword());
         } catch (ServletException e) {
             this.errors.addToast(Toast.notice("Failed to log in :/"));
         }

@@ -110,7 +110,8 @@ class CheckoutTest {
 
         var placed = this.orders.findAllByUser_username("admin");
         var latest = placed.get(placed.size() - 1);
-        assertThat(latest.getOrderItems()).hasSize(3);
+        assertThat(latest.getOrderItems()).hasSize(1);
+        assertThat(latest.getOrderItems().get(0).getQuantity()).isEqualTo(3);
     }
 
     /**

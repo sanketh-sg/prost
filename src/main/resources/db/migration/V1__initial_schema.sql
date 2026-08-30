@@ -37,7 +37,6 @@ create sequence addresses_seq start with 1 increment by 50;
 create sequence beverage_seq start with 1 increment by 50;
 create sequence order_items_seq start with 1 increment by 50;
 create sequence orders_seq start with 1 increment by 50;
-create sequence privileges_seq start with 1 increment by 50;
 create sequence roles_seq start with 1 increment by 50;
 
 create table addresses (
@@ -75,19 +74,14 @@ create table orders (
     primary key (id)
 );
 
--- One row per physical unit ordered, not a line with a quantity.
+-- One row per order line, carrying a quantity, not one row per physical unit.
 create table order_items (
-    id          bigint not null,
+    id          bigint  not null,
     position    varchar(255),
     price       numeric(10, 2) check (price >= 0.01),
-    beverage_id bigint not null,
+    quantity    integer check (quantity >= 1),
+    beverage_id bigint  not null,
     order_id    bigint,
-    primary key (id)
-);
-
-create table privileges (
-    id   bigint not null,
-    name varchar(255),
     primary key (id)
 );
 
@@ -95,12 +89,6 @@ create table roles (
     id   bigint not null,
     name varchar(255),
     primary key (id)
-);
-
-create table roles_privileges (
-    role_id      bigint not null,
-    privilege_id bigint not null,
-    primary key (role_id, privilege_id)
 );
 
 -- username is the natural primary key; every foreign key references it.
@@ -133,14 +121,6 @@ alter table order_items
 alter table orders
     add constraint FK32ql8ubntj5uh44ph9659tiih
     foreign key (user_id) references users;
-
-alter table roles_privileges
-    add constraint FK5duhoc7rwt8h06avv41o41cfy
-    foreign key (privilege_id) references privileges;
-
-alter table roles_privileges
-    add constraint FK629oqwrudgp5u7tewl07ayugj
-    foreign key (role_id) references roles;
 
 alter table users
     add constraint FK59ttwko9dwcdjb2u2ech0h1qe

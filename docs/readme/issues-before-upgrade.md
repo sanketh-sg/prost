@@ -113,7 +113,7 @@ checked before anything is written. A simple re-check would not have been enough
 two customers checking out at the same instant can both read "two in stock" before
 either writes, and both pass. The lock forces them into a queue.
 
-### Prices are stored as approximate numbers — *still open*
+### Prices are stored as approximate numbers
 
 Money is held in a type designed for scientific measurement, not currency. It
 cannot represent most decimal amounts exactly: in this type, `0.1 + 0.2` does not
@@ -126,7 +126,10 @@ finance system uses an exact decimal type.
 There is a second bug in the same place: a rule requiring a minimum price of 1
 silently forbids selling anything under €1.
 
-**Status:** identified and planned, not yet fixed.
+**What happened:** fixed. Every price field (bottles, crates, orders, order
+lines) is now an exact decimal type instead of a floating-point one, backed by a
+`numeric(10, 2)` column. The minimum-price rule was corrected at the same time —
+it now blocks a price of zero rather than anything under a whole euro.
 
 ### The basket's lookup table did not work as a lookup table
 
@@ -142,7 +145,7 @@ misbehaved.
 **What happened:** fixed. Products are now fingerprinted by their database
 identity.
 
-### An order of one crate wrote 24 rows — *still open*
+### An order of one crate wrote 24 rows
 
 Buying a crate of 24 bottles records 24 identical rows in the orders table, one
 per bottle, instead of one row saying "24".
@@ -150,7 +153,8 @@ per bottle, instead of one row saying "24".
 **Why it matters:** the orders table grows far faster than it should, and any
 future work on order history has to cope with the duplication.
 
-**Status:** identified and planned, not yet fixed. It needs a database change.
+**What happened:** fixed. Order lines now carry a quantity column, so one line
+in the basket becomes one row, however many units it represents.
 
 ### An off-by-one in the page navigation
 
@@ -241,7 +245,11 @@ every extra line is one more thing to read, test and get wrong.
 - **A permissions system that granted nothing.** There is an elaborate
   role-and-privilege structure, but the code that populates it always fills it
   with an empty list, so it grants no permissions to anyone. Several of its
-  methods are never called at all. *Still open.*
+  methods are never called at all. *Fixed by deletion*: nothing anywhere in the
+  application ever checked a privilege, only a role, so populating it would have
+  changed no behaviour — the honest fix was to remove the unused structure
+  (`Privilege` entity, the join table, the dead-code methods), not build out a
+  feature nobody consumed.
 - **Reflection-based admin actions** — 78 lines to look up methods by name, when
   five ordinary methods would do. *Fixed, along with the security problem it
   caused.*
@@ -254,20 +262,21 @@ every extra line is one more thing to read, test and get wrong.
 
 ## What is still open
 
-Four things are known, documented and deliberately not yet fixed:
+The four things that were known, documented and deliberately left for later have
+all since been fixed:
 
-| Issue | Why it is still open |
+| Issue | What was done |
 |---|---|
-| Money stored as an approximate number | Needs a database change; batched with the other two below |
-| One order row per bottle instead of a quantity | Needs a database change |
-| The permissions system that grants nothing | Needs a database change |
-| The two sets of security rules are duplicated | Low risk today — both copies currently match |
+| Money stored as an approximate number | Prices are now an exact decimal type (`numeric(10, 2)`), and the minimum-price rule now blocks €0 instead of anything under €1 |
+| One order row per bottle instead of a quantity | Order lines now carry a quantity column |
+| The permissions system that grants nothing | Deleted — nothing in the app ever checked a privilege, only a role |
+| The two sets of security rules are duplicated | Extracted into one shared method both profiles call, so they cannot drift apart silently again |
 
-The first three all require altering the live database, which is the one kind of
-change the test suite cannot verify: development and tests rebuild their database
-from scratch each time, so a faulty migration only reveals itself when production
-starts up. They are grouped together so that they can be done carefully, once,
-against a real database.
+The first two required altering the live database, which is the one kind of
+change the test suite cannot verify on its own: development and tests rebuild
+their database from scratch each time, so a faulty migration only reveals itself
+when production starts up. There is no production data yet, so the schema file
+was edited in place rather than layered with a new migration.
 
 There is also one cosmetic defect, introduced during this work and knowingly left:
 the "passwords didn't match" message displays without its apostrophe, because the

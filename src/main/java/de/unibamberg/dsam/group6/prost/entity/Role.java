@@ -3,7 +3,6 @@ package de.unibamberg.dsam.group6.prost.entity;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +22,4 @@ public class Role implements Serializable {
 
     @ManyToMany(mappedBy = "roles")
     private Collection<User> users;
-
-    @ManyToMany
-    @JoinTable(
-            name = "roles_privileges",
-            joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-    private Set<Privilege> privileges;
 }

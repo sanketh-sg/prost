@@ -16,11 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NamedEntityGraph(
         name = "user-with-roles",
         attributeNodes = {
-            @NamedAttributeNode(value = "roles", subgraph = "roles.privileges"),
+            @NamedAttributeNode("roles"),
             @NamedAttributeNode("billingAddress"),
             @NamedAttributeNode("deliveryAddress")
-        },
-        subgraphs = @NamedSubgraph(name = "roles.privileges", attributeNodes = @NamedAttributeNode("privileges")))
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -69,13 +68,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        final var authorities = new HashSet<GrantedAuthority>();
-        this.roles.stream().map(r -> new SimpleGrantedAuthority(r.getName())).forEach(authorities::add);
-        this.roles.stream()
-                .flatMap(r -> r.getPrivileges().stream())
-                .map(r -> new SimpleGrantedAuthority(r.getName()))
-                .forEach(authorities::add);
-        return authorities;
+        return this.roles.stream().map(r -> new SimpleGrantedAuthority(r.getName())).toList();
     }
 
     @Override

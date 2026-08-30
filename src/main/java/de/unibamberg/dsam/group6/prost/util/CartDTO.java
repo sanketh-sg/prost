@@ -19,8 +19,7 @@ public class CartDTO {
         var self = new CartDTO();
         self.totalPrice = order.getPrice();
         for (var orderItem : order.getOrderItems()) {
-            var currentCount = self.beverages.getOrDefault(orderItem.getBeverage(), 0);
-            self.beverages.put(orderItem.getBeverage(), currentCount + 1);
+            self.beverages.merge(orderItem.getBeverage(), orderItem.getQuantity(), Integer::sum);
         }
         return self;
     }
@@ -46,21 +45,23 @@ public class CartDTO {
     /**
      * Maps CartDTO object with cart items as Beverage instances into
      * instances of OrderItem (they are not persisted yet).
+     *
+     * <p>One row per distinct beverage, carrying its quantity — not one row per
+     * unit, which used to make a crate of 24 bottles write 24 identical rows.
      */
     public List<OrderItem> getOrderItems() {
         var orderItems = new ArrayList<OrderItem>();
         var position = 0;
 
         for (var b : this.beverages.entrySet()) {
-            for (int i = 0; i < b.getValue(); i++) {
-                var beverage = b.getKey();
-                var oi = new OrderItem();
-                oi.setPrice(beverage.getPrice());
-                oi.setBeverage(beverage);
-                oi.setPosition(String.valueOf(position));
-                orderItems.add(oi);
-                position++;
-            }
+            var beverage = b.getKey();
+            var oi = new OrderItem();
+            oi.setPrice(beverage.getPrice());
+            oi.setQuantity(b.getValue());
+            oi.setBeverage(beverage);
+            oi.setPosition(String.valueOf(position));
+            orderItems.add(oi);
+            position++;
         }
         return orderItems;
     }

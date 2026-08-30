@@ -21,7 +21,6 @@ public class DatabaseLoader {
     private final CratesRepository cratesRepository;
     private final PasswordEncoder encoder;
     private final RolesRepository rolesRepository;
-    private final PrivilegesRepository privilegesRepository;
 
     @Value("classpath:data.json")
     private Resource dataFile;
@@ -40,27 +39,15 @@ public class DatabaseLoader {
         return String.join(System.lineSeparator(), this.importUsers(), this.importBottles(), this.importCrates());
     }
 
-    private Role createRoleIfNotFound(String name, Set<Privilege> privileges) {
+    private Role createRoleIfNotFound(String name) {
         final var role = this.rolesRepository.findByName(name);
         if (role.isEmpty()) {
             var newRole = new Role();
             newRole.setName(name);
-            newRole.setPrivileges(privileges);
             this.rolesRepository.save(newRole);
             return newRole;
         }
         return role.get();
-    }
-
-    private Privilege createPrivilegeIfNotFound(String name) {
-        final var privilege = this.privilegesRepository.findByName(name);
-        if (privilege.isEmpty()) {
-            var newPrivilege = new Privilege();
-            newPrivilege.setName(name);
-            this.privilegesRepository.save(newPrivilege);
-            return newPrivilege;
-        }
-        return privilege.get();
     }
 
     public String importUsers() throws IOException {
@@ -70,7 +57,7 @@ public class DatabaseLoader {
             final var roleStr = u.get("role");
             final var role = new HashSet<Role>();
             if (roleStr != null) {
-                role.add(this.createRoleIfNotFound(roleStr, Collections.emptySet()));
+                role.add(this.createRoleIfNotFound(roleStr));
             }
 
             this.userRepository.save(User.builder()

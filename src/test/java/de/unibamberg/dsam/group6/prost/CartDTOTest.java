@@ -92,7 +92,7 @@ public class CartDTOTest {
                 .build());
         this.cart.addToCart(b.getId(), count);
         assertThat(this.getDTO().getOrderItems().stream()
-                        .map(oi -> oi.getPrice())
+                        .map(oi -> oi.getPrice().multiply(BigDecimal.valueOf(oi.getQuantity())))
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .isEqualByComparingTo(this.cart.getCartState().getTotalPrice());
     }

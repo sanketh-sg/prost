@@ -11,7 +11,7 @@
          }"
          th:id="'toast_message-' + ${toastStat.index}"
     >
-        <div nl2br:text="${toast.getMessage()}"></div>
+        <div class="whitespace-pre-line" th:text="${toast.getMessage()}"></div>
         <button class="toast_container__toast-close-button"
                 th:onclick="prostLib.transitions.slideOffScreen('#toast_message-[[${toastStat.index}]]')">
             <i class="fa-solid fa-x"></i>

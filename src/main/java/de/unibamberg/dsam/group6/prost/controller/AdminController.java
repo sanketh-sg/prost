@@ -6,14 +6,13 @@ import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.repository.CratesRepository;
 import de.unibamberg.dsam.group6.prost.repository.OrdersRepository;
 import de.unibamberg.dsam.group6.prost.repository.UserRepository;
-import de.unibamberg.dsam.group6.prost.service.AdminActionsProvider;
 import de.unibamberg.dsam.group6.prost.service.UserErrorManager;
+import de.unibamberg.dsam.group6.prost.service.admin.DatabaseLoader;
 import de.unibamberg.dsam.group6.prost.service.admin.VersionReader;
+import de.unibamberg.dsam.group6.prost.util.Redirects;
 import de.unibamberg.dsam.group6.prost.util.Toast;
-import de.unibamberg.dsam.group6.prost.util.exception.CallFailedException;
 import jakarta.validation.Valid;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AdminController {
     private final UserErrorManager errors;
-    private final AdminActionsProvider actions;
+    private final DatabaseLoader databaseLoader;
     private final BottlesRepository bottlesRepository;
     private final CratesRepository cratesRepository;
     private final OrdersRepository ordersRepository;
@@ -37,7 +36,6 @@ public class AdminController {
     @GetMapping("")
     public String adminIndex(
             @RequestParam(name = "p") Optional<String> page, @RequestParam Optional<String> username, Model model) {
-        model.addAttribute("actions", this.actions.getAnnotatedInstances());
         model.addAttribute("version", this.version.getVersion());
 
         // Thymeleaf 3.1 removed #request, so the templates can no longer read these
@@ -57,48 +55,51 @@ public class AdminController {
         return "pages/admin";
     }
 
-    @GetMapping("/action")
-    public String runAction(
-            @RequestParam(name = "a") Optional<String> action,
-            @RequestParam Optional<Boolean> await,
-            @RequestParam Optional<String> next) {
-        // Every exit below reports. Actions are resolved by reflection from a query
-        // parameter, so a typo is routine — and a bare redirect looks exactly like
-        // success, which is how a mistyped action reads as "it worked, but nothing
-        // happened".
-        if (action.isEmpty()) {
-            log.warn("Admin action requested with no 'a' parameter");
-            this.errors.addToast(Toast.error("No action specified."));
-            return "redirect:" + next.orElse("/admin");
-        }
+    @PostMapping("/import/users")
+    public String importUsers(@RequestParam Optional<String> next) {
+        return this.runAction(this.databaseLoader::importUsers, next);
+    }
 
-        var a = action.get().split("::");
-        if (a.length != 2) {
-            log.warn("Malformed admin action '{}'", action.get());
-            this.errors.addToast(Toast.error("Malformed action '%s'. Expected 'instance::method'.", action.get()));
-            return "redirect:" + next.orElse("/admin");
-        }
+    @PostMapping("/import/bottles")
+    public String importBottles(@RequestParam Optional<String> next) {
+        return this.runAction(this.databaseLoader::importBottles, next);
+    }
 
-        var instance = this.actions.getAnnotatedInstances().stream()
-                .filter(i -> i.getInstanceName().equals(a[0]))
-                .toList();
-        if (instance.size() != 1) {
-            log.warn("Unknown admin action instance '{}'", a[0]);
-            this.errors.addToast(Toast.error("Unknown action instance '%s'.", a[0]));
-            return "redirect:" + next.orElse("/admin");
-        }
+    @PostMapping("/import/crates")
+    public String importCrates(@RequestParam Optional<String> next) {
+        return this.runAction(this.databaseLoader::importCrates, next);
+    }
 
+    @PostMapping("/import/all")
+    public String importAll(@RequestParam Optional<String> next) {
+        return this.runAction(this.databaseLoader::importAll, next);
+    }
+
+    @PostMapping("/clear")
+    public String clearDatabase(@RequestParam Optional<String> next) {
+        return this.runAction(this.databaseLoader::clearDatabase, next);
+    }
+
+    /**
+     * Runs one seed action, reporting the outcome as a toast.
+     *
+     * <p>These were previously one GET endpoint that resolved a method by name from a query
+     * parameter and invoked it reflectively, which left every destructive operation pre-fetchable
+     * and outside CSRF protection.
+     */
+    private String runAction(AdminAction action, Optional<String> next) {
         try {
-            if (await.orElse(false)) {
-                this.errors.addToast(
-                        Toast.success(instance.get(0).callAndReturn(a[1]).get().toString()));
-            } else {
-                instance.get(0).call(a[1]);
-            }
-        } catch (CallFailedException | InterruptedException | ExecutionException e) {
-            this.errors.addToast(Toast.error("Action failed: %s", e));
+            this.errors.addToast(Toast.success(action.run()));
+        } catch (Exception e) {
+            log.warn("Admin action failed", e);
+            this.errors.addToast(Toast.error("Action failed: %s", e.getMessage()));
         }
-        return "redirect:" + next.orElse("/admin");
+        return "redirect:" + Redirects.safe(next, "/admin");
+    }
+
+    @FunctionalInterface
+    private interface AdminAction {
+        String run() throws Exception;
     }
 
     @GetMapping("/form")
@@ -128,7 +129,7 @@ public class AdminController {
             var added = this.bottlesRepository.save(bottle);
             this.errors.addToast(Toast.success("%s added successfully.", added.getName()));
         }
-        return "redirect:" + next.orElse("/admin");
+        return "redirect:" + Redirects.safe(next, "/admin");
     }
 
     @PostMapping("/addCrate")
@@ -142,6 +143,6 @@ public class AdminController {
             var added = this.cratesRepository.save(crate);
             this.errors.addToast(Toast.success("%s added successfully.", added.getName()));
         }
-        return "redirect:" + next.orElse("/admin");
+        return "redirect:" + Redirects.safe(next, "/admin");
     }
 }

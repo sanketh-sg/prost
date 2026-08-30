@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      # The Gradle build shells out to pnpm to bundle the frontend, so Node has
+      # to be on PATH before any Gradle task runs. pnpm/action-setup reads the
+      # packageManager field in package.json, so the version is not duplicated here.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
+      - name: Run tests
+        run: ./gradlew test
+      - name: Publish test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/reports/tests/test

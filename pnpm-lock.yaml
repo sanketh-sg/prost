@@ -11,18 +11,19 @@ importers:
       '@fortawesome/fontawesome-free':
         specifier: ^6.2.1
         version: 6.7.2
+    devDependencies:
       css-loader:
         specifier: ^6.7.2
         version: 6.11.0(webpack@5.109.2)
       css-minimizer-webpack-plugin:
         specifier: ^4.2.2
         version: 4.2.2(webpack@5.109.2)
+      eslint:
+        specifier: ^8.28.0
+        version: 8.57.1
       mini-css-extract-plugin:
         specifier: ^2.7.1
         version: 2.10.2(webpack@5.109.2)
-      pnpm:
-        specifier: ^7.25.0
-        version: 7.33.7
       postcss:
         specifier: ^8.4.19
         version: 8.5.26
@@ -32,6 +33,9 @@ importers:
       postcss-preset-env:
         specifier: ^7.8.3
         version: 7.8.3(postcss@8.5.26)
+      prettier:
+        specifier: ^2.8.0
+        version: 2.8.8
       tailwindcss:
         specifier: ^3.2.4
         version: 3.4.19
@@ -44,13 +48,6 @@ importers:
       webpack-watch-files-plugin:
         specifier: ^1.2.1
         version: 1.2.1(webpack@5.109.2)
-    devDependencies:
-      eslint:
-        specifier: ^8.28.0
-        version: 8.57.1
-      prettier:
-        specifier: ^2.8.0
-        version: 2.8.8
 
 packages:
 
@@ -1162,11 +1159,6 @@ packages:
   pkg-dir@4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
-
-  pnpm@7.33.7:
-    resolution: {integrity: sha512-ev4kEGQrOcaY30baTOXHIxpczjYGmNafjPj0IlfUCz5D8jEFOwe43oSf1P+/SnH/V7g1E3d3o1I4jz09p0cgDg==}
-    engines: {node: '>=14.6'}
-    hasBin: true
 
   postcss-attribute-case-insensitive@5.0.2:
     resolution: {integrity: sha512-XIidXV8fDr0kKt28vqki84fRK8VW8eTuIa4PChv2MqKuT6C9UjmSKzen6KaWhWEoYvwxFCa7n/tC1SZ3tyq4SQ==}
@@ -2890,8 +2882,6 @@ snapshots:
   pkg-dir@4.2.0:
     dependencies:
       find-up: 4.1.0
-
-  pnpm@7.33.7: {}
 
   postcss-attribute-case-insensitive@5.0.2(postcss@8.5.26):
     dependencies:

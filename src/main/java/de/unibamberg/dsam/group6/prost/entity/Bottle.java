@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import java.util.Objects;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.hibernate.validator.constraints.URL;
 
 @Entity(name = "bottles")
@@ -47,19 +45,6 @@ public class Bottle extends Beverage {
     @Column(name = "in_stock")
     @Min(0)
     private int inStock;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Bottle bottle = (Bottle) o;
-        return getId() != null && Objects.equals(getId(), bottle.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 
     @Override
     public String getPicture() {

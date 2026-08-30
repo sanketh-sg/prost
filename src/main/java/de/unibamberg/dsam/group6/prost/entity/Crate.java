@@ -5,9 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.util.Objects;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.hibernate.validator.constraints.URL;
 
 @Entity(name = "crates")
@@ -42,27 +40,10 @@ public class Crate extends Beverage {
     @Min(0)
     private int cratesInStock;
 
-    // region Relations
-
     @ManyToOne
     @JoinColumn(name = "bottle_id")
     @NotNull(message = "Must choose a bottle.")
     private Bottle bottle;
-
-    // endregion
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Crate crate = (Crate) o;
-        return getId() != null && Objects.equals(getId(), crate.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 
     @Override
     public String getPicture() {

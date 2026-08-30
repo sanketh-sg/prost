@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      xmlns:nl2br="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta th:replace="include/head">
     <link rel="stylesheet" href="/build/summary_page.css">
@@ -24,7 +23,7 @@
                     <div th:if="${user.deliveryAddress != null}" class="py-5 flex flex-row justify-end text-right">
                         <div>
                             <h3 class="text-2xl font-bold">Deliver to:</h3>
-                            <p nl2br:text="${user.deliveryAddress.toString()}"></p>
+                            <p class="whitespace-pre-line" th:text="${user.deliveryAddress.toString()}"></p>
                         </div>
                     </div>
 

@@ -43,8 +43,6 @@ public class User implements UserDetails {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
-    // region Relations
-
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
 
@@ -56,8 +54,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "delivery_address_id")
     private Address deliveryAddress;
 
-    // endregion
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,7 +64,7 @@ public class User implements UserDetails {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return this.username == null ? System.identityHashCode(this) : this.username.hashCode();
     }
 
     @Override

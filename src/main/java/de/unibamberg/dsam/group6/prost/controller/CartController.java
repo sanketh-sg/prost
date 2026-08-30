@@ -5,6 +5,7 @@ import de.unibamberg.dsam.group6.prost.repository.UserRepository;
 import de.unibamberg.dsam.group6.prost.service.Cart;
 import de.unibamberg.dsam.group6.prost.service.OrderService;
 import de.unibamberg.dsam.group6.prost.service.UserErrorManager;
+import de.unibamberg.dsam.group6.prost.util.Redirects;
 import de.unibamberg.dsam.group6.prost.util.Toast;
 import de.unibamberg.dsam.group6.prost.util.exception.BadRequestException;
 import java.security.Principal;
@@ -46,7 +47,7 @@ public class CartController {
             this.cart.addToCart(beverageId.get(), count.orElse(1));
         }
 
-        return "redirect:" + next.orElse("/");
+        return "redirect:" + Redirects.safe(next, "/");
     }
 
     @PostMapping("/cart/remove")
@@ -63,7 +64,7 @@ public class CartController {
         } else {
             this.cart.removeOneFromCart(beverageId.get());
         }
-        return "redirect:" + next.orElse("/");
+        return "redirect:" + Redirects.safe(next, "/");
     }
 
     @PostMapping("/cart/submit")

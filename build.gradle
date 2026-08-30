@@ -110,6 +110,9 @@ tasks.register('frontendBuild', Exec) {
     // template edit changes the generated CSS.
     inputs.dir('src/main/resources/templates')
     outputs.dir('src/main/resources/static/build')
+    // Exec tasks aren't cacheable by default even with org.gradle.caching=true;
+    // this is the ~90s step, so it's the one worth opting in explicitly.
+    outputs.cacheIf { true }
     commandLine pnpm(['run', 'build:prod'])
 }
 

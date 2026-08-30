@@ -3,11 +3,11 @@ package de.unibamberg.dsam.group6.prost.controller;
 import de.unibamberg.dsam.group6.prost.entity.Bottle;
 import de.unibamberg.dsam.group6.prost.repository.BottlesRepository;
 import de.unibamberg.dsam.group6.prost.repository.CratesRepository;
-import de.unibamberg.dsam.group6.prost.util.OffsetBasedPageRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +37,7 @@ public class IndexController {
             currentPage = page.get();
         }
 
-        var pagable = new OffsetBasedPageRequest(currentPage * 9, 9);
+        var pagable = PageRequest.of(currentPage, 9);
 
         Page<Bottle> bottles;
         if (containsAlcohol.isPresent()) {
@@ -65,7 +65,7 @@ public class IndexController {
             currentPage = page.get();
         }
 
-        var pagable = new OffsetBasedPageRequest(currentPage * 9, 9);
+        var pagable = PageRequest.of(currentPage, 9);
         var bottles = this.cratesRepository.findAll(pagable);
 
         model.addAttribute("beverages", bottles.getContent());

@@ -64,7 +64,7 @@ public class User implements UserDetails {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return this.username == null ? System.identityHashCode(this) : this.username.hashCode();
     }
 
     @Override

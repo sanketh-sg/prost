@@ -1,54 +1,37 @@
-<div class="pagination">
-    <form id="pagination-form" method="get" th:data-pagination-max-page="${max_page}">
-        <input th:each="p : ${param}" type="hidden" th:name="${p.key}" th:value="${p.value[0]}">
-        <div class="Pagination__container">
-            <button
-                type="button"
-                class="Pagination__submit with-text rounded-tl-xl rounded-bl-xl"
-                data-pagination="0"
-                th:classappend="${
-                    (param.get('page') == null ? '0' : param.get('page'))
-                        .toString().equals('0') ? 'disabled' : ''
-                }"
-                onclick="prostLib.pagination.changePage(this)"
-            >First
-            </button>
-            <button
-                type="button"
-                class="Pagination__submit"
-                data-pagination="-1"
-                th:classappend="${
-                    (param.get('page') == null ? '0' : param.get('page'))
-                        .toString().equals('0') ? 'disabled' : ''
-                }"
-                onclick="prostLib.pagination.changePage(this)"
-            >
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <button
-                type="button"
-                class="Pagination__submit"
-                data-pagination="+1"
-                th:classappend="${
-                    (param.get('page') == null ? '0' : param.get('page'))
-                        .toString().equals(max_page.toString()) ? 'disabled' : ''
-                }"
-                onclick="prostLib.pagination.changePage(this)"
-            >
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-            <button
-                type="button"
-                class="Pagination__submit with-text rounded-tr-xl rounded-br-xl"
-                data-pagination="max"
-                onclick="prostLib.pagination.changePage(this)"
-                th:classappend="${
-                    (param.get('page') == null ? '0' : param.get('page'))
-                        .toString().equals(max_page.toString()) ? 'disabled' : ''
-                }"
-            >
-                Last
-            </button>
-        </div>
-    </form>
+<div class="pagination" xmlns:th="http://www.thymeleaf.org">
+    <!--
+      Real links, not buttons driving a hidden form through JavaScript: pages stay
+      bookmarkable, middle-clickable and usable with scripting unavailable.
+      currentUri is the request path without its query string, so this fragment
+      serves /bottles and /crates unchanged.
+    -->
+    <div class="Pagination__container"
+         th:with="filter=${param.containsAlcohol != null ? param.containsAlcohol[0] : null},
+                  prev=${current_page - 1 < 0 ? 0 : current_page - 1},
+                  next=${current_page + 1 > max_page ? max_page : current_page + 1}">
+        <a class="Pagination__submit with-text rounded-tl-xl rounded-bl-xl"
+           th:classappend="${current_page == 0 ? 'disabled' : ''}"
+           th:href="${filter != null}
+                    ? @{${currentUri}(page=0, containsAlcohol=${filter})}
+                    : @{${currentUri}(page=0)}">First</a>
+        <a class="Pagination__submit"
+           th:classappend="${current_page == 0 ? 'disabled' : ''}"
+           th:href="${filter != null}
+                    ? @{${currentUri}(page=${prev}, containsAlcohol=${filter})}
+                    : @{${currentUri}(page=${prev})}">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <a class="Pagination__submit"
+           th:classappend="${current_page >= max_page ? 'disabled' : ''}"
+           th:href="${filter != null}
+                    ? @{${currentUri}(page=${next}, containsAlcohol=${filter})}
+                    : @{${currentUri}(page=${next})}">
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a class="Pagination__submit with-text rounded-tr-xl rounded-br-xl"
+           th:classappend="${current_page >= max_page ? 'disabled' : ''}"
+           th:href="${filter != null}
+                    ? @{${currentUri}(page=${max_page}, containsAlcohol=${filter})}
+                    : @{${currentUri}(page=${max_page})}">Last</a>
+    </div>
 </div>

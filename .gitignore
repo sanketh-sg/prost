@@ -9,6 +9,7 @@ build/
 .classpath
 **/.classpath
 /docs/superpowers
+# /docs/readme
 
 # Node
 node_modules/

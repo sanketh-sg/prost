@@ -1,5 +1,6 @@
 # Build output
 build/
+bin/
 */build/
 .gradle
 */.gradle
@@ -9,6 +10,7 @@ build/
 .classpath
 **/.classpath
 /docs/superpowers
+.claude/
 # /docs/readme
 
 # Node

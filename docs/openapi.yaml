@@ -1,0 +1,484 @@
+openapi: 3.0.3
+info:
+  title: Prost
+  description: >
+    Server-rendered Thymeleaf application. Endpoints return HTML pages or
+    302 redirects, not JSON, and mutating endpoints accept
+    application/x-www-form-urlencoded bodies (HTML forms) rather than JSON.
+    Authentication is a Spring Security form-login session cookie
+    (JSESSIONID); non-GET requests additionally require a CSRF token in prod.
+  version: "1.0"
+servers:
+  - url: /
+
+security:
+  - sessionCookie: []
+
+tags:
+  - name: pages
+  - name: cart
+  - name: orders
+  - name: auth
+  - name: user
+  - name: admin
+
+paths:
+  /:
+    get:
+      tags: [pages]
+      summary: Home page
+      security: []
+      responses:
+        "200":
+          description: Home page HTML
+          content:
+            text/html: {}
+
+  /order_success:
+    get:
+      tags: [pages]
+      summary: Order confirmation page
+      security: []
+      responses:
+        "200":
+          description: Confirmation page HTML
+          content:
+            text/html: {}
+
+  /bottles:
+    get:
+      tags: [pages]
+      summary: Bottle catalogue (paginated)
+      security: []
+      parameters:
+        - name: containsAlcohol
+          in: query
+          schema: { type: boolean }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 0 }
+      responses:
+        "200":
+          description: Bottle catalogue page HTML
+          content:
+            text/html: {}
+
+  /crates:
+    get:
+      tags: [pages]
+      summary: Crate catalogue (paginated)
+      security: []
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 0 }
+      responses:
+        "200":
+          description: Crate catalogue page HTML
+          content:
+            text/html: {}
+
+  /error:
+    get:
+      tags: [pages]
+      summary: Generic error page
+      security: []
+      responses:
+        default:
+          description: Error page HTML
+          content:
+            text/html: {}
+
+  /cart:
+    get:
+      tags: [cart]
+      summary: Show current user's cart
+      responses:
+        "200":
+          description: Cart page HTML
+          content:
+            text/html: {}
+        "302":
+          description: Redirect to /login if not authenticated
+
+  /cart/add:
+    post:
+      tags: [cart]
+      summary: Add a beverage to the cart
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                beverageId: { type: integer, format: int64 }
+                count: { type: integer, default: 1 }
+                next: { type: string, description: Relative path to redirect back to }
+              required: [beverageId]
+      responses:
+        "302":
+          description: Redirect to next (or /)
+        "400":
+          description: Missing beverageId
+
+  /cart/remove:
+    post:
+      tags: [cart]
+      summary: Remove a beverage from the cart
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                beverageId: { type: integer, format: int64 }
+                all: { type: boolean, default: false, description: Remove all units instead of one }
+                next: { type: string }
+              required: [beverageId]
+      responses:
+        "302":
+          description: Redirect to next (or /)
+        "400":
+          description: Missing beverageId
+
+  /cart/submit:
+    post:
+      tags: [cart]
+      summary: Place an order from the current cart
+      responses:
+        "302":
+          description: Redirect to /order_success on success, or /cart with a toast on failure (empty cart, order rejected, or insufficient stock)
+
+  /orders:
+    get:
+      tags: [orders]
+      summary: List the current user's orders
+      responses:
+        "200":
+          description: Orders list page HTML
+          content:
+            text/html: {}
+
+  /orders/{id}:
+    get:
+      tags: [orders]
+      summary: Show one of the current user's orders
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          description: Order detail page HTML
+          content:
+            text/html: {}
+        "302":
+          description: Redirect to /orders if the order does not exist or belongs to another user
+
+  /whoami:
+    get:
+      tags: [auth]
+      summary: Return the current principal's username (dev profile only)
+      security: []
+      responses:
+        "200":
+          description: Username, or "not logged in"
+          content:
+            text/plain: {}
+
+  /login:
+    get:
+      tags: [auth]
+      summary: Login page
+      security: []
+      parameters:
+        - name: next
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Login page HTML
+          content:
+            text/html: {}
+    post:
+      tags: [auth]
+      summary: Submit login credentials (handled by Spring Security form login)
+      security: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+              required: [username, password]
+      responses:
+        "302":
+          description: Redirect to next/home on success, or /login on failure
+
+  /logout:
+    post:
+      tags: [auth]
+      summary: Log out the current user
+      responses:
+        "302":
+          description: Redirect to /
+
+  /register:
+    get:
+      tags: [auth]
+      summary: Registration page
+      security: []
+      responses:
+        "200":
+          description: Registration page HTML
+          content:
+            text/html: {}
+        "302":
+          description: Redirect to / if already authenticated
+    post:
+      tags: [auth]
+      summary: Register a new account and log in
+      security: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string }
+                passwordCheck: { type: string, description: Must match password }
+                birthday: { type: string, format: date, description: "yyyy-MM-dd; must be in the past, after 1900, and 16+ years ago" }
+              required: [username, password, birthday]
+      responses:
+        "200":
+          description: Registration page re-rendered with validation errors
+          content:
+            text/html: {}
+        "302":
+          description: Redirect to / on success
+
+  /user:
+    get:
+      tags: [user]
+      summary: Show current user's settings
+      responses:
+        "200":
+          description: User settings page HTML
+          content:
+            text/html: {}
+    post:
+      tags: [user]
+      summary: Update current user's settings (billing/delivery address, birthday)
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                billingAddress.id: { type: integer, format: int64 }
+                deliveryAddress.id: { type: integer, format: int64 }
+                birthday: { type: string, format: date }
+      responses:
+        "302":
+          description: Redirect to /user
+
+  /user/addAddress:
+    post:
+      tags: [user]
+      summary: Add a new address, selectable as billing/delivery
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AddressForm"
+      responses:
+        "302":
+          description: Redirect to /user
+
+  /admin:
+    get:
+      tags: [admin]
+      summary: Admin dashboard
+      description: Requires ROLE_ADMIN
+      parameters:
+        - name: p
+          in: query
+          description: Selected panel, e.g. "orders"
+          schema: { type: string }
+        - name: username
+          in: query
+          description: Filter orders panel by username
+          schema: { type: string }
+      responses:
+        "200":
+          description: Admin dashboard HTML
+          content:
+            text/html: {}
+        "403":
+          description: Not an admin
+
+  /admin/import/users:
+    post:
+      tags: [admin]
+      summary: Seed users from the bundled dataset
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                next: { type: string }
+      responses:
+        "302":
+          description: Redirect to next (or /admin) with a result toast
+
+  /admin/import/bottles:
+    post:
+      tags: [admin]
+      summary: Seed bottles from the bundled dataset
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                next: { type: string }
+      responses:
+        "302":
+          description: Redirect to next (or /admin) with a result toast
+
+  /admin/import/crates:
+    post:
+      tags: [admin]
+      summary: Seed crates from the bundled dataset
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                next: { type: string }
+      responses:
+        "302":
+          description: Redirect to next (or /admin) with a result toast
+
+  /admin/import/all:
+    post:
+      tags: [admin]
+      summary: Seed users, bottles, and crates from the bundled dataset
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                next: { type: string }
+      responses:
+        "302":
+          description: Redirect to next (or /admin) with a result toast
+
+  /admin/clear:
+    post:
+      tags: [admin]
+      summary: Clear the database
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                next: { type: string }
+      responses:
+        "302":
+          description: Redirect to next (or /admin) with a result toast
+
+  /admin/form:
+    get:
+      tags: [admin]
+      summary: Render the add-bottle/add-crate form
+      description: Requires ROLE_ADMIN
+      parameters:
+        - name: type
+          in: query
+          schema: { type: string, enum: [bottle, crate] }
+      responses:
+        "200":
+          description: Admin form page HTML
+          content:
+            text/html: {}
+
+  /admin/addBottle:
+    post:
+      tags: [admin]
+      summary: Add a bottle
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/BottleForm"
+      responses:
+        "302":
+          description: Redirect to next (or /admin)
+
+  /admin/addCrate:
+    post:
+      tags: [admin]
+      summary: Add a crate
+      description: Requires ROLE_ADMIN
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/CrateForm"
+      responses:
+        "302":
+          description: Redirect to next (or /admin)
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+      description: Spring Security form-login session. /cart/**, /orders/**, /user/** require any authenticated user; /admin/** requires ROLE_ADMIN.
+  schemas:
+    AddressForm:
+      type: object
+      required: [street, number, postalCode]
+      properties:
+        street: { type: string }
+        number: { type: string }
+        postalCode: { type: string, maxLength: 5 }
+    BottleForm:
+      type: object
+      required: [name, supplier, price]
+      properties:
+        next: { type: string }
+        name: { type: string, pattern: '^\w+$' }
+        bottlePic: { type: string, format: uri }
+        volume: { type: number, minimum: 0 }
+        volumePercent: { type: number, minimum: 0 }
+        price: { type: number, format: decimal, minimum: 0.01 }
+        supplier: { type: string }
+        inStock: { type: integer, minimum: 0 }
+    CrateForm:
+      type: object
+      required: [name, bottle.id, price]
+      properties:
+        next: { type: string }
+        name: { type: string, pattern: '^\w+$' }
+        cratePic: { type: string, format: uri }
+        noOfBottles: { type: integer, minimum: 1 }
+        price: { type: number, format: decimal, minimum: 0.01 }
+        cratesInStock: { type: integer, minimum: 0 }
+        bottle.id: { type: integer, format: int64, description: ID of the bottle this crate contains }
